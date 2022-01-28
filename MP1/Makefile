@@ -1,10 +1,10 @@
-all: crc, crsd
+all: crc crsd
 	
-crc:
-	g++ crc.cpp -g -o crc
+crc: crc.cpp
+	g++ crc.cpp -g -w -o crc -lpthread -lrt
 	
-crsd:
-	g++ crsd.cpp -g -o crsd
+crsd: crsd.cpp
+	g++ crsd.cpp -g -w -o crsd -lpthread -lrt
 	
 clean:
 	rm -f crc
