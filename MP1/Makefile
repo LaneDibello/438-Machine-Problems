@@ -1,10 +1,10 @@
 all: crc, crsd
 	
 crc:
-	g++ crc.c -g -o crc
+	g++ crc.cpp -g -o crc
 	
 crsd:
-	g++ crsd.c -g -o crsd
+	g++ crsd.cpp -g -o crsd
 	
 clean:
 	rm -f crc

@@ -9,15 +9,87 @@
 #include <string.h>
 #include <pthread.h>
 #include <errno.h>
+#include <vector>
+#include <sstream>
 #include "interface.h"
 
-short lastport = 1025;
+class DB {
+    public:
+    struct servEntry {
+        std::string name;
+        int port;
+        pthread_t tid;
+        size_t member_count;
+    };
+    
+    short lastport = 1025;
+    std::vector<servEntry> chatDB;
 
-struct servEntry {
-    char* name;
-    int port;
-    pthread_t tid;
+    DB(int port){
+        struct servEntry se;
+        se.name = "base control";
+        se.port = port;
+        se.tid = -1;
+        se.member_count = 0;
+        chatDB.push_back(se);
+    }
+
+    int add(std::string chat_name){
+        if (contains(chat_name)) return 0;
+        struct servEntry se;
+        se.name = chat_name;
+        se.member_count = 0;
+        if (contains(lastport)) lastport++; //skip over first port
+        se.port = lastport;
+        pthread_t cst;
+        std::string lport = std::to_string(lastport);
+        pthread_create(&cst, NULL, chat_server, (void*)lport.c_str());
+        lastport++;
+        se.tid = cst;
+        chatDB.push_back(se);
+        pthread_detach(cst);
+    }
+
+    bool contains(int port){
+        for (struct servEntry se : chatDB){
+            if (se.port == port) return true;
+        }
+        return false;
+    }
+
+    bool contains(std::string chat_name){
+        for (struct servEntry se : chatDB){
+            if (se.name == chat_name) return true;
+        }
+        return false;
+    }
+
+    bool remove(std::string chat_name) {
+        for (size_t i = 0; i < chatDB.size(); i++)
+        {
+            if (chatDB.at(i).name == chat_name){
+                //maybe send a msg to the server being deleted?
+                chatDB.erase(chatDB.begin() + i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool get_info(std::string chat_name, int& memb_count, int& port_no) {
+        for (struct servEntry se : chatDB){
+            if (se.name == chat_name){
+                memb_count = se.member_count;
+                se.member_count++; //for joining user
+                port_no = se.port;
+                return true;
+            }
+        }
+        return false;
+    }
 };
+
+DB* chatRooms;
 
 void *chat_server(void* port){
     //Create a server socket and do all the bindings etc
@@ -27,6 +99,26 @@ void *chat_server(void* port){
         //broadcast the message out to every server
 }
 
+int retmsg(int sockfd, void* msg, int msglen){
+    //Send Command
+	int count;
+    if((count = send(sockfd, (char*)msg, msglen, 0)) < 0){ 
+    	perror("Send failed in sendmsg");
+        exit(1);
+    }
+    return count;
+}
+
+void* getmsg(int sockfd, int msglen){
+    //Recieve Reply
+    int count;
+    void* reply = malloc(msglen);
+    if ((count = recv(sockfd, reply, msglen, 0)) == -1){
+    	perror("Recieve failed in sendmsg");
+        exit(1);
+    }
+    return reply;
+}
 
 int main(int argc, char** argv){
     
@@ -34,6 +126,8 @@ int main(int argc, char** argv){
         perror("Please supply a port number!");
         exit(1);
     }
+
+    DB* chatRooms = new DB(atoi(argv[1]));
     
     char* port_no = strdup(argv[1]);
     int sockfd;
@@ -69,49 +163,68 @@ int main(int argc, char** argv){
     
     //Enter operation loop
     while(1){
-        //block until it recieves a command
         char commandbuf[MAX_DATA];
-        int count;
-        if ((count = recv(sockfd, commandbuf, MAX_DATA, 0)) == -1) {
-            perror("Recieve Failed for server");
-            return errno;
-        }
+        memcpy(commandbuf, getmsg(sockfd, MAX_DATA), MAX_DATA);
+        std::string command(commandbuf); 
+        struct Reply reply;
+        std::stringstream ss("CHAT ROOMS:\n-----------\n");
+        std::string output;
         switch(commandbuf[0]){
         //CREATE
             case 'C':
-            //select a new port
-            if(lastport==atoi(port_no)) lastport++;
-            
-            //generate a chat_server thread with that port
-            pthread_t cst;
-            std::string lport = std::to_string(lastport);
-            pthread_create(&cst, NULL, chat_server, (void*)lport.c_str());
-            lastport++;
-            
-            //add port, name, and thread_id to database
-            
-            //supply the port to the client
-            
+            int nport = chatRooms->add(command.substr(command.find(' ')+1));
+            if (!nport){
+                //Do room already exist stuff
+                reply.status = FAILURE_ALREADY_EXISTS;
+                break;
+            }
+            reply.status = SUCCESS;
             break;
         //DELETE
             case 'D':
-            //find entry in database using the name
-            //signal chat_server thread to shut down
-            //remove database entry
-            //reply to client
+            if(!chatRooms->remove(command.substr(command.find(' ')+1))){
+                //Do room not exist stuff
+                reply.status = FAILURE_NOT_EXISTS;
+                break;
+            }
+            reply.status = SUCCESS;
             break;
         //JOIN
             case 'J':
-            //find entry in database
-            //supply the port and memeber count to the user
-            //increment member count
+                //find entry in database
+                //supply the port and memeber count to the user
+                int memb_count;
+                int port_no;
+                if(!chatRooms->get_info(command.substr(command.find(' ')+1), memb_count, port_no)){
+                    reply.status = FAILURE_NOT_EXISTS;
+                    break;
+                }
+                reply.status = SUCCESS;
+                reply.num_member = memb_count;
+                reply.port = port_no;
+                break;
             break;
         //LIST
             case 'L':
-            //enumerate all the rooms in the database
-            //return it to the client
+                //enumerate all the rooms in the database
+                for (size_t i = 1; i < chatRooms->chatDB.size(); i++)
+                {
+                    ss << chatRooms->chatDB.at(i).name << std::endl;
+                }
+                reply.status = SUCCESS;
+                output = ss.str();
+                if (output.length() > 255){
+                    output = output.substr(0, 252);
+                    output += "...";
+                }
+                strcpy(reply.list_room, output.c_str());
+            break;
+        //DEFAULT
+            default:
+            reply.status = FAILURE_INVALID;
             break;
         }
+
     }
     
     return 0;
