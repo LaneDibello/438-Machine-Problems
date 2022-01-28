@@ -16,6 +16,7 @@
 int retmsg(int sockfd, void* msg, int msglen);
 void* getmsg(int sockfd, int msglen);
 void* command_server(void* clientfd);
+void* chat_server(void* port);
 
 void *chat_server(void* port){
     //Create a server socket and do all the bindings etc
@@ -89,10 +90,10 @@ class DB {
         pthread_t cst;
         std::string lport = std::to_string(lastport);
         pthread_create(&cst, NULL, chat_server, (void*)lport.c_str());
+        pthread_detach(cst);
         lastport++;
         se.tid = cst;
         chatDB.push_back(se);
-        pthread_detach(cst);
     }
 
     bool contains(int port){
@@ -134,6 +135,7 @@ class DB {
     }
 };
 
+pthread_mutex_t DBlock;
 DB* chatRooms;
 
 int retmsg(int sockfd, void* msg, int msglen){
@@ -171,44 +173,59 @@ void* command_server(void* clientfd){
         switch(commandbuf[0]){
         //CREATE
             case 'C':
-            {int nport = chatRooms->add(command.substr(command.find(' ')+1));
-            if (!nport){
-                //Do room already exist stuff
-                reply.status = FAILURE_ALREADY_EXISTS;
-                break;
+            {
+                pthread_mutex_lock(&DBlock);
+                int nport = chatRooms->add(command.substr(command.find(' ')+1));
+                pthread_mutex_unlock(&DBlock);
+                if (!nport){
+                    //Do room already exist stuff
+                    reply.status = FAILURE_ALREADY_EXISTS;
+                    break;
+                }
+                reply.status = SUCCESS;
             }
-            reply.status = SUCCESS;}
             break;
         //DELETE
             case 'D':
-            {if(!chatRooms->remove(command.substr(command.find(' ')+1))){
-                //Do room not exist stuff
-                reply.status = FAILURE_NOT_EXISTS;
-                break;
+            {
+                pthread_mutex_lock(&DBlock);
+                int res = chatRooms->remove(command.substr(command.find(' ')+1));
+                pthread_mutex_unlock(&DBlock);
+                    if(!res){
+                    //Do room not exist stuff
+                    reply.status = FAILURE_NOT_EXISTS;
+                    break;
+                }
+                reply.status = SUCCESS;
             }
-            reply.status = SUCCESS;
-            break;}
+            break;
         //JOIN
             case 'J':
-             {   //find entry in database
+            {   //find entry in database
                 //supply the port and memeber count to the user
                 int memb_count;
                 int port_no;
-                if(!chatRooms->get_info(command.substr(command.find(' ')+1), memb_count, port_no)){
+                pthread_mutex_lock(&DBlock);
+                bool succ = chatRooms->get_info(command.substr(command.find(' ')+1), memb_count, port_no);
+                pthread_mutex_unlock(&DBlock);
+                if(!succ){
                     reply.status = FAILURE_NOT_EXISTS;
                     break;
                 }
                 reply.status = SUCCESS;
                 reply.num_member = memb_count;
                 reply.port = port_no;
-            break;}
+            }
+            break;
         //LIST
             case 'L':
-                {//enumerate all the rooms in the database
+            {//enumerate all the rooms in the database
+                pthread_mutex_lock(&DBlock);
                 for (size_t i = 1; i < chatRooms->chatDB.size(); i++)
                 {
                     ss << chatRooms->chatDB.at(i).name << std::endl;
                 }
+                pthread_mutex_unlock(&DBlock);
                 reply.status = SUCCESS;
                 output = ss.str();
                 if (output.length() > 255){
@@ -216,15 +233,19 @@ void* command_server(void* clientfd){
                     output += "...";
                 }
                 strcpy(reply.list_room, output.c_str());
-            break;}
+            }
+            break;
         //DEFAULT
             default:
-            {reply.status = FAILURE_INVALID;
-            break;}
+            {
+                reply.status = FAILURE_INVALID;
+            }
+            break;
         }
         retmsg(sockfd, &reply, sizeof(reply));
         if (commandbuf[0] == 'J' && reply.status == SUCCESS) {
-            return;
+            close(sockfd);
+            return nullptr;
         }
     }
     
@@ -237,7 +258,7 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    DB* chatRooms = new DB(atoi(argv[1]));
+    chatRooms = new DB(atoi(argv[1]));
     
     char* port_no = strdup(argv[1]);
     int sockfd;
@@ -283,6 +304,7 @@ int main(int argc, char** argv){
         pthread_detach(t);
     }
 
+    close(sockfd);
     
     return 0;
 }
