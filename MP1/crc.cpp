@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-
+#include <string> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,8 +16,8 @@ struct Reply process_command(const int sockfd, char* command);
 void process_chatmode(const char* host, const int port);
 
 //threads
-void recv_thread(void* sockfd);
-void send_thread(void* sockfd);
+void *recv_thread(void* sockfd);
+void *send_thread(void* sockfd);
 
 int main(int argc, char** argv) 
 {
@@ -62,16 +62,16 @@ int main(int argc, char** argv)
 int connect_to(const char *host, const int port)
 {
 	int rv;
+	int sockfd;
     struct addrinfo hints, *res;
     
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     
-    char port_no[20];
-    itoa(port, port_no, 10);
+    std::string port_no = std::to_string(port);
     
-    if ((rv = getaddrinfo(host, port_no, &hints, &res)) != 0) { 
+    if ((rv = getaddrinfo(host, port_no.c_str(), &hints, &res)) != 0) { 
     	perror("Failed to obtain adress info");
     	exit(1);
     }
@@ -137,24 +137,25 @@ void process_chatmode(const char* host, const int port)
     
 }
 
-void recv_thread(void* sockfd){
+void *recv_thread(void* sockfd){
 	while(1){
 		//Recieve Chats
 	    char buffer[MAX_DATA];
-	    if ((count = recv(sockfd, buffer, MAX_DATA, 0)) == -1){
+		int count;
+	    if ((count = recv(*(int *)sockfd, buffer, MAX_DATA, 0)) == -1){
 	    	perror("Recieve failed in recv_thread");
 	    }
 	    display_message(buffer);
 	}
 }
 
-void send_thread(void* sockfd){
+void *send_thread(void* sockfd){
 	while(1){
 		//Send Chat
 		char buffer[MAX_DATA];
 		get_message(buffer, MAX_DATA);
 		int count;
-	    if((count = send(sockfd, command, strlen(command) + 1, 0)) < 0){ 
+	    if((count = send(*(int *)sockfd, buffer, strlen(buffer) + 1, 0)) < 0){ 
 	    	perror("Send failed in send_thread");
 	    }
 	}

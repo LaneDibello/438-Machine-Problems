@@ -1,10 +1,10 @@
 all: crc, crsd
 	
 crc:
-	gcc crc.c -g -Wall -ansi -o crc
+	g++ crc.c -g -o crc
 	
 crsd:
-	gcc crsd.c -g -Wall -ansi -o crsd
+	g++ crsd.c -g -o crsd
 	
 clean:
 	rm -f crc

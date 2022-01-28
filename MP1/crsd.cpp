@@ -3,11 +3,12 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
-
+#include <string> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <errno.h>
 #include "interface.h"
 
 short lastport = 1025;
@@ -16,9 +17,9 @@ struct servEntry {
     char* name;
     int port;
     pthread_t tid;
-}
+};
 
-void chat_server(void* port){
+void *chat_server(void* port){
     //Create a server socket and do all the bindings etc
     
     //Enter operation loop
@@ -35,6 +36,7 @@ int main(int argc, char** argv){
     }
     
     char* port_no = strdup(argv[1]);
+    int sockfd;
     
     //Create a server socket and do all the bindings etc
     int rv;
@@ -82,9 +84,8 @@ int main(int argc, char** argv){
             
             //generate a chat_server thread with that port
             pthread_t cst;
-            char* lport;
-            itoa(lastport, lport, 10);
-            pthread_create(&cst, NULL, chat_server, (void*)lport);
+            std::string lport = std::to_string(lastport);
+            pthread_create(&cst, NULL, chat_server, (void*)lport.c_str());
             lastport++;
             
             //add port, name, and thread_id to database
