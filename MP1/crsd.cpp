@@ -31,22 +31,22 @@ void *chat_server(void* port){
 
     if ((rv = getaddrinfo(NULL, (char*)port, &hints, &serv)) != 0) {
         perror("getaddrinfo for Chat server failed");
-        exit(1);
+        pthread_exit(NULL);
     }
     if((sockfd = socket(serv->ai_family, serv->ai_socktype, serv->ai_protocol)) == -1) {
         perror("Chat Server Socket Creation failed");
-        exit(1);
+        pthread_exit(NULL);
     }
     if (bind(sockfd, serv->ai_addr, serv->ai_addrlen) == -1) {
         perror("Chat Server Bind Failed"); 
         close(sockfd);
-        exit(1);
+        pthread_exit(NULL);
     }
     freeaddrinfo(serv);
     if (listen(sockfd, 20) == -1) {
         perror("Listener for Chat server Failed");
         close(sockfd);
-        exit(1);
+        pthread_exit(NULL);
     }
 
     //Enter operation loop
@@ -82,18 +82,25 @@ class DB {
 
     int add(std::string chat_name){
         if (contains(chat_name)) return 0;
+        
         struct servEntry se;
         se.name = chat_name;
         se.member_count = 0;
         if (contains(lastport)) lastport++; //skip over first port
         se.port = lastport;
+        
         pthread_t cst;
         std::string lport = std::to_string(lastport);
-        pthread_create(&cst, NULL, chat_server, (void*)lport.c_str());
+        char * hlport = new char [lport.length()+1];
+        strcpy(hlport, lport.c_str());
+        pthread_create(&cst, NULL, chat_server, (void*)hlport);
         pthread_detach(cst);
+        
         lastport++;
         se.tid = cst;
         chatDB.push_back(se);
+        
+        return se.port;
     }
 
     bool contains(int port){
@@ -143,18 +150,20 @@ int retmsg(int sockfd, void* msg, int msglen){
 	int count;
     if((count = send(sockfd, (char*)msg, msglen, 0)) < 0){ 
     	perror("Send failed in retmsg");
-        exit(1);
+        pthread_exit(NULL);
     }
     return count;
 }
 
 void* getmsg(int sockfd, int msglen){
     //Recieve Reply
-    int count;
+    int count = 0;
     void* reply = malloc(msglen);
-    if ((count = recv(sockfd, reply, msglen, 0)) == -1){
-    	perror("Recieve failed in getmsg");
-        exit(1);
+    while (!count){
+        if ((count = recv(sockfd, reply, msglen, 0)) == -1){
+    	    perror("Recieve failed in getmsg");
+            pthread_exit(NULL);
+        }
     }
     return reply;
 }
@@ -168,7 +177,8 @@ void* command_server(void* clientfd){
         memcpy(commandbuf, getmsg(sockfd, MAX_DATA), MAX_DATA);
         std::string command(commandbuf); 
         struct Reply reply;
-        std::stringstream ss("CHAT ROOMS:\n-----------\n");
+        std::stringstream ss;
+        ss << "\n-----------\n";
         std::string output;
         switch(commandbuf[0]){
         //CREATE
@@ -299,8 +309,10 @@ int main(int argc, char** argv){
             perror("Bad accept on server");
             continue;
         }
+        void* fd = malloc(sizeof(clientfd));
+        *(int*)fd = clientfd;
         pthread_t t;
-        pthread_create(&t, NULL, command_server, (void*)&clientfd);
+        pthread_create(&t, NULL, command_server, fd);
         pthread_detach(t);
     }
 
