@@ -1,12 +1,13 @@
 #include <netdb.h>
 #include <netinet/in.h>
+#include <cctype>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <string> 
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
+//#include <iostream>
 #include <string.h>
 #include <pthread.h>
 #include <errno.h>
@@ -21,6 +22,7 @@ void* command_server(void* clientfd);
 void* chat_server(void* port);
 void* cs_daemon(void* csi);
 void* bs_daemon(void* cri);
+void notify_delete(int sig);
 
 struct cs_info{
     int fd;
@@ -142,7 +144,7 @@ class DB {
         size_t member_count;
     };
     
-    short lastport = 1025;
+    short lastport = 1024;
     std::vector<servEntry> chatDB;
 
     DB(int port){
@@ -195,7 +197,7 @@ class DB {
         for (size_t i = 0; i < chatDB.size(); i++)
         {
             if (chatDB.at(i).name == chat_name){
-                //maybe send a msg to the server being deleted?
+                pthread_cancel(chatDB.at(i).tid);
                 chatDB.erase(chatDB.begin() + i);
                 return true;
             }
@@ -257,9 +259,8 @@ void* command_server(void* clientfd){
         std::string command(commandbuf); 
         struct Reply reply;
         std::stringstream ss;
-        ss << "\n-----------\n";
         std::string output;
-        switch(commandbuf[0]){
+        switch(toupper(commandbuf[0])){
         //CREATE
             case 'C':
             {
@@ -312,7 +313,7 @@ void* command_server(void* clientfd){
                 pthread_mutex_lock(&DBlock);
                 for (size_t i = 1; i < chatRooms->chatDB.size(); i++)
                 {
-                    ss << chatRooms->chatDB.at(i).name << std::endl;
+                    ss << chatRooms->chatDB.at(i).name << ',';
                 }
                 pthread_mutex_unlock(&DBlock);
                 reply.status = SUCCESS;
