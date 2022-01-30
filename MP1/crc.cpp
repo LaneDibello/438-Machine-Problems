@@ -146,7 +146,9 @@ void *recv_thread(void* sockfd){
 	    if ((count = recv(*(int *)sockfd, buffer, MAX_DATA, 0)) == -1){
 	    	perror("Recieve failed in recv_thread");
 	    }
+		if (!count) continue;
 	    display_message(buffer);
+		printf("\n");
 	}
 }
 
@@ -155,8 +157,10 @@ void *send_thread(void* sockfd){
 		//Send Chat
 		char buffer[MAX_DATA];
 		get_message(buffer, MAX_DATA);
+		size_t msg_len = strlen(buffer);
+		if (!msg_len) continue;
 		int count;
-	    if((count = send(*(int *)sockfd, buffer, strlen(buffer) + 1, 0)) < 0){ 
+	    if((count = send(*(int *)sockfd, buffer, msg_len + 1, 0)) < 0){ 
 	    	perror("Send failed in send_thread");
 	    }
 	}

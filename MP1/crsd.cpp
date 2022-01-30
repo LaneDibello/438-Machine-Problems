@@ -6,10 +6,12 @@
 #include <string> 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include <string.h>
 #include <pthread.h>
 #include <errno.h>
 #include <vector>
+#include <queue>
 #include <sstream>
 #include "interface.h"
 
@@ -17,7 +19,15 @@ int retmsg(int sockfd, void* msg, int msglen);
 void* getmsg(int sockfd, int msglen);
 void* command_server(void* clientfd);
 void* chat_server(void* port);
-void* cs_daemon(void* sockfd);
+void* cs_daemon(void* csi);
+void* bs_daemon(void* cri);
+
+struct cs_info{
+    int fd;
+    std::queue<std::string>* msg_queue;
+    pthread_mutex_t* ms_lock;
+    std::vector<int>* fd_pool;
+};
 
 void *chat_server(void* port){
     //Create a server socket and do all the bindings etc
@@ -50,6 +60,20 @@ void *chat_server(void* port){
         pthread_exit(NULL);
     }
 
+    void* cri = malloc(sizeof(cs_info));
+    //Create msg queue, lock, and rfd pool
+    std::queue<std::string>* msq = new std::queue<std::string>;
+    pthread_mutex_t* msqlock = new pthread_mutex_t;
+    std::vector<int>* rfds = new std::vector<int>;
+    ((cs_info*)cri)->msg_queue = msq;
+    ((cs_info*)cri)->ms_lock = msqlock;
+    ((cs_info*)cri)->fd_pool = rfds;
+
+    //Create Broadcast thread that will send to these fds when a msg is queued
+    pthread_t u;
+    pthread_create(&u, NULL, bs_daemon, cri);
+    pthread_detach(u);
+
     //accept incoming traffic
     while(1){
         int chatfd = accept(sockfd, (struct sockaddr*)NULL, NULL);
@@ -57,24 +81,55 @@ void *chat_server(void* port){
             perror("Bad accept on chat server");
             continue;
         }
-        void* fd = malloc(sizeof(chatfd));
-        *(int*)fd = chatfd;
+        void* csi = malloc(sizeof(cs_info));
+        ((cs_info*)csi)->fd = chatfd;
+        ((cs_info*)csi)->msg_queue = msq;
+        ((cs_info*)csi)->ms_lock = msqlock;
+        rfds->push_back(chatfd);
         pthread_t t;
-        pthread_create(&t, NULL, cs_daemon, fd);
+        pthread_create(&t, NULL, cs_daemon, csi);
         pthread_detach(t);
     }
 
     
 }
 
-void* cs_daemon(void* sockfd){
+void enqueue_msg(std::string msg, std::queue<std::string>* mq, pthread_mutex_t* mql){
+    pthread_mutex_lock(mql);
+    mq->push(msg);
+    pthread_mutex_unlock(mql);
+}
+
+std::string dequeue_msg(std::queue<std::string>* mq, pthread_mutex_t* mql) {
+    pthread_mutex_lock(mql);
+    std::string ret = mq->front();
+    mq->pop();
+    pthread_mutex_unlock(mql);
+    return ret;
+}
+
+void* cs_daemon(void* csi){
     //Enter operation loop
     while(1){
         //block until a message is recieved
         char msgbuff[MAX_DATA];
-        memcpy(msgbuff, getmsg(*(int*)sockfd, MAX_DATA), MAX_DATA);
+        memcpy(msgbuff, getmsg(((cs_info*)csi)->fd, MAX_DATA), MAX_DATA);
         //broadcast the message out to every client
-        retmsg(*(int*)sockfd, msgbuff, MAX_DATA);
+        std::string msg(msgbuff);
+        if(msg.length() < 1) continue;
+        enqueue_msg(msg, ((cs_info*)csi)->msg_queue, ((cs_info*)csi)->ms_lock);
+    }
+}
+
+void* bs_daemon(void* cri){
+    //Enter operation loop
+    while(1){
+        while(((cs_info*)cri)->msg_queue->empty()) usleep(20000); //20 ms ping
+        std::string msg = dequeue_msg(((cs_info*)cri)->msg_queue, ((cs_info*)cri)->ms_lock);
+        if(msg.length() < 1) continue;
+        for (int i = 0; i < ((cs_info*)cri)->fd_pool->size(); i++){
+            retmsg(((cs_info*)cri)->fd_pool->at(i), (void*)msg.c_str(), msg.length() + 1);
+        }
     }
 }
 
@@ -149,11 +204,11 @@ class DB {
     }
 
     bool get_info(std::string chat_name, int& memb_count, int& port_no) {
-        for (struct servEntry se : chatDB){
-            if (se.name == chat_name){
-                memb_count = se.member_count;
-                se.member_count++; //for joining user
-                port_no = se.port;
+        for (int i = 0; i < chatDB.size(); i++){
+            if (chatDB.at(i).name == chat_name){
+                memb_count = chatDB.at(i).member_count;
+                chatDB.at(i).member_count++; //for joining user
+                port_no = chatDB.at(i).port;
                 return true;
             }
         }
@@ -168,10 +223,13 @@ int retmsg(int sockfd, void* msg, int msglen){
     //Send Command
 	int count;
     if((count = send(sockfd, (char*)msg, msglen, 0)) < 0){ 
+        fprintf(stderr, "\nError on thread ID: %lu, msglen: %i, sockfd: %i, msg: %s", pthread_self(), msglen, sockfd, (char*)msg);
     	perror("Send failed in retmsg");
-        printf("\nError on thread ID: %lu, msglen: %i, sockfd: %i, msg: %s", pthread_self(), msglen, sockfd, (char*)msg);
         pthread_exit(NULL);
     }
+    //DEBUG
+    //std::cout << "sent msg: " << std::string((char*)msg) << std::endl;
+    ///////
     return count;
 }
 
