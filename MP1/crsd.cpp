@@ -17,6 +17,7 @@ int retmsg(int sockfd, void* msg, int msglen);
 void* getmsg(int sockfd, int msglen);
 void* command_server(void* clientfd);
 void* chat_server(void* port);
+void* cs_daemon(void* sockfd);
 
 void *chat_server(void* port){
     //Create a server socket and do all the bindings etc
@@ -49,13 +50,31 @@ void *chat_server(void* port){
         pthread_exit(NULL);
     }
 
+    //accept incoming traffic
+    while(1){
+        int chatfd = accept(sockfd, (struct sockaddr*)NULL, NULL);
+        if (chatfd == -1){
+            perror("Bad accept on chat server");
+            continue;
+        }
+        void* fd = malloc(sizeof(chatfd));
+        *(int*)fd = chatfd;
+        pthread_t t;
+        pthread_create(&t, NULL, cs_daemon, fd);
+        pthread_detach(t);
+    }
+
+    
+}
+
+void* cs_daemon(void* sockfd){
     //Enter operation loop
     while(1){
         //block until a message is recieved
         char msgbuff[MAX_DATA];
-        memcpy(msgbuff, getmsg(sockfd, MAX_DATA), MAX_DATA);
+        memcpy(msgbuff, getmsg(*(int*)sockfd, MAX_DATA), MAX_DATA);
         //broadcast the message out to every client
-        retmsg(sockfd, msgbuff, MAX_DATA);
+        retmsg(*(int*)sockfd, msgbuff, MAX_DATA);
     }
 }
 
@@ -150,6 +169,7 @@ int retmsg(int sockfd, void* msg, int msglen){
 	int count;
     if((count = send(sockfd, (char*)msg, msglen, 0)) < 0){ 
     	perror("Send failed in retmsg");
+        printf("\nError on thread ID: %lu, msglen: %i, sockfd: %i, msg: %s", pthread_self(), msglen, sockfd, (char*)msg);
         pthread_exit(NULL);
     }
     return count;
@@ -161,7 +181,8 @@ void* getmsg(int sockfd, int msglen){
     void* reply = malloc(msglen);
     while (!count){
         if ((count = recv(sockfd, reply, msglen, 0)) == -1){
-    	    perror("Recieve failed in getmsg");
+            fprintf(stderr, "Error on thread ID: %lu, msglen: %i, sockfd: %i", pthread_self(), msglen, sockfd);
+    	    perror("\nRecieve failed in getmsg");
             pthread_exit(NULL);
         }
     }

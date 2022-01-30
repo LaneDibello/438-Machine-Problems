@@ -123,7 +123,8 @@ struct Reply process_command(const int sockfd, char* command)
  */
 void process_chatmode(const char* host, const int port)
 {
-	int crsock = connect_to(host, port);
+	int* crsock = new int;
+	*crsock = connect_to(host, port);
 	
 	//make threads
 	pthread_t rec;
