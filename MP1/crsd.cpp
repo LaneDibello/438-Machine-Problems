@@ -296,8 +296,8 @@ int retmsg(int sockfd, void* msg, int msglen){
     //Send Command
 	int count;
     if((count = send(sockfd, (char*)msg, msglen, 0)) < 0){ 
-        fprintf(stderr, "\nError on thread ID: %lu, msglen: %i, sockfd: %i, msg: %s", pthread_self(), msglen, sockfd, (char*)msg);
-    	perror("Send failed in retmsg");
+        //fprintf(stderr, "\nError on thread ID: %lu, msglen: %i, sockfd: %i, msg: %s", pthread_self(), msglen, sockfd, (char*)msg);
+    	//perror("Send failed in retmsg");
         pthread_exit(NULL);
     }
     //DEBUG
@@ -312,8 +312,8 @@ void* getmsg(int sockfd, int msglen){
     void* reply = malloc(msglen);
     while (!count){
         if ((count = recv(sockfd, reply, msglen, 0)) == -1){
-            fprintf(stderr, "Error on thread ID: %lu, msglen: %i, sockfd: %i", pthread_self(), msglen, sockfd);
-    	    perror("\nRecieve failed in getmsg");
+            //fprintf(stderr, "Error on thread ID: %lu, msglen: %i, sockfd: %i", pthread_self(), msglen, sockfd);
+    	    //perror("\nRecieve failed in getmsg");
             pthread_exit(NULL);
         }
     }

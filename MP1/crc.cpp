@@ -11,6 +11,8 @@
 #include <pthread.h>
 #include "interface.h"
 
+//#include <iostream> //TEMP
+
 int connect_to(const char *host, const int port);
 struct Reply process_command(const int sockfd, char* command);
 void process_chatmode(const char* host, const int port);
@@ -18,6 +20,8 @@ void process_chatmode(const char* host, const int port);
 //threads
 void *recv_thread(void* sockfd);
 void *send_thread(void* sockfd);
+
+char* master_port;
 
 int main(int argc, char** argv) 
 {
@@ -28,9 +32,11 @@ int main(int argc, char** argv)
 	}
 
     display_title();
+
+	master_port = argv[2];
     
 	while (1) {
-	
+
 		int sockfd = connect_to(argv[1], atoi(argv[2]));
     
 		char command[MAX_DATA];
@@ -132,10 +138,15 @@ void process_chatmode(const char* host, const int port)
 	pthread_create(&rec, NULL, recv_thread, (void*)crsock);
 	pthread_create(&sen, NULL, send_thread, (void*)crsock);
 	
-	//wait for program to end
+	//wait for reciever to end
 	pthread_join(rec, NULL);
-	pthread_join(sen, NULL);
+	//kill the sender
+	pthread_cancel(sen);
     
+	close(*crsock);
+	//DEBUG
+	//std::cout << "Running: " << "./crc " << host << ' ' << master_port << std::endl;
+	execlp("./crc", "./crc", host, master_port, NULL);
 }
 
 void *recv_thread(void* sockfd){
@@ -149,6 +160,9 @@ void *recv_thread(void* sockfd){
 		if (!count) continue;
 	    display_message(buffer);
 		printf("\n");
+		if (strncmp(buffer, "chat room being deleted, shutting down connection...", 50) == 0){
+			return NULL;
+		}
 	}
 }
 
