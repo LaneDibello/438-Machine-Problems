@@ -122,7 +122,7 @@ void *chat_server(void* cdi){
         pthread_t t;
         pthread_create(&t, NULL, cs_daemon, csi);
         tids->push_back(t);
-        //pthread_detach(t);
+        pthread_detach(t);
     }
 
 }
@@ -136,7 +136,7 @@ void* deletion_awaiter(void* di){
     pthread_t u = ((d_info*)di)->u;
     pthread_t parent = ((d_info*)di)->parent;
     while(1){
-        if (cdi->terminated){
+        if (*cdi->terminated){
             enqueue_msg("chat room being deleted, shutting down connection...", msq, msqlock, -1);
             sleep(1); //wait for IO
             for (int i = 0; i < tids->size(); i++){
@@ -189,7 +189,7 @@ void* bs_daemon(void* cri){
             if ((((cs_info*)cri)->fd_pool->at(i) == skip_fd)) continue;
             retmsg(((cs_info*)cri)->fd_pool->at(i), (void*)rmsg.c_str(), msg.length() + 1);
         }
-        if (skip_fd = -1){
+        if (skip_fd == -1){
             for (int i = 0; i < ((cs_info*)cri)->fd_pool->size(); i++){
                 close(((cs_info*)cri)->fd_pool->at(i));
             }
