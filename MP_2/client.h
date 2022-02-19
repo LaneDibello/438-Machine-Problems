@@ -1,5 +1,7 @@
 #include <iostream>
+#include <exception>
 #include <string>
+#include <sstream>
 #include <ctime>
 #include <vector>
 #include <grpc++/grpc++.h>
