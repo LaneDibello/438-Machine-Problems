@@ -48,6 +48,24 @@ class Client : public IClient
         std::unique_ptr<SNSService::Stub> stub_;
 };
 
+enum IStatus msgCodeToStatus(std::string msg){
+    switch(msg[0]) {
+        case '0':
+            return SUCCESS;
+        case '1': //Input username already exists
+            return FAILURE_ALREADY_EXISTS;
+        case '2': //Input username does not exists
+            return FAILURE_NOT_EXISTS;
+        case '3': //Command failed with invalid username
+            return FAILURE_INVALID_USERNAME;
+        case '4': //Command failed with invalid command
+            return FAILURE_INVALID;
+        case '5': //Command failed with unknown reaso
+        default:
+            return FAILURE_UNKNOWN;
+    }
+}
+
 void read_timeline(std::shared_ptr<ClientReaderWriter<Message, Message>> stream);
 
 void write_timeline(std::shared_ptr<ClientReaderWriter<Message, Message>> stream, std::string username);
@@ -106,6 +124,7 @@ IReply Client::processCommand(std::string& input)
 	Request request;
 	Reply reply;
 	IReply ire;
+	std::string r_msg;
 	
 	ss >> token;
 	switch (token[0]) {
@@ -113,39 +132,42 @@ IReply Client::processCommand(std::string& input)
 	        request.set_username(username);
 	        ss >> uname;
 	        if (ss.fail()) {
-	            ire.comm_status = FAILURE_INVALID_USERNAME;
+	            ire.comm_status = FAILURE_INVALID;
 	            break;
 	        }
 	        request.add_arguments(uname);
 	        status = stub_->Follow(&context, request, &reply);
-	        if (status.ok()) {
+	        r_msg = reply.msg();
+	        if (r_msg == "0") {
                 ire.comm_status = SUCCESS;
             } else {
-                ire.comm_status = FAILURE_NOT_EXISTS;
+                ire.comm_status = msgCodeToStatus(r_msg);
             }
 	        break;
 	    case 'U':
 	        request.set_username(username);
 	        ss >> uname;
 	        if (ss.fail()) {
-	            ire.comm_status = FAILURE_INVALID_USERNAME;
+	            ire.comm_status = FAILURE_INVALID;
 	            break;
 	        }
 	        request.add_arguments(uname);
 	        status = stub_->UnFollow(&context, request, &reply);
-	        if (status.ok()) {
+	        r_msg = reply.msg();
+	        if (r_msg == "0") {
                 ire.comm_status = SUCCESS;
             } else {
-                ire.comm_status = FAILURE_NOT_EXISTS;
+                ire.comm_status = msgCodeToStatus(r_msg);
             }
 	        break;
 	    case 'L':
 	        request.set_username(username);
 	        status = stub_->List(&context, request, &reply);
-	        if (status.ok()) {
+	        r_msg = reply.msg();
+	        if (r_msg == "0") {
                 ire.comm_status = SUCCESS;
             } else {
-                ire.comm_status = FAILURE_UNKNOWN;
+                ire.comm_status = msgCodeToStatus(reply.msg());
             }
             for (int i = 0; i < reply.all_users_size(); i++){
                 ire.all_users.push_back(reply.all_users(i));
@@ -202,7 +224,9 @@ void write_timeline(std::shared_ptr<ClientReaderWriter<Message, Message>> stream
         Message m;
         m.set_username(username);
         m.set_msg(getPostMessage());
-        //m.timestamp() = TimeUtil::TimeTToTimestamp(std::time(nullptr));
+        std::time_t t = std::time(nullptr);
+        Timestamp* ts = m.mutable_timestamp();
+        *ts = TimeUtil::TimeTToTimestamp(t);
         stream->Write(m);
     }
 }

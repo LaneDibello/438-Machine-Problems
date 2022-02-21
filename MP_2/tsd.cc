@@ -49,6 +49,7 @@ class user_t {
       //following();
       timeline.open ("Timelines/" + name + ".tml", std::ofstream::out | std::ofstream::app);
       std::cout << "New client: " << name << std::endl;
+      add_follower(this);
       
     }
     
@@ -63,13 +64,14 @@ class user_t {
     }
     
     bool rem_follower(user_t* u){
+      if (u->name == name) { return false; }
       std::cout << name << " unfollowing " << u->name << std::endl;
       return following.erase(u->name);
     }
     
     void post_timeline(std::string msg, std::time_t& time){
       std::string t_str(std::ctime(&time));
-      t_str[t_str.size()-1] = '\0';
+      //t_str[t_str.size()-1] = '\0';
       std::string line = name + "(" + t_str + ") >> " + msg;
       timeline << line;
       
@@ -88,7 +90,9 @@ class user_t {
       Message m;
       m.set_msg(msg);
       m.set_username(username);
-      //m.set_timestamp();
+      std::time_t t = std::time(nullptr);
+      Timestamp* ts = m.mutable_timestamp();
+      *ts = TimeUtil::TimeTToTimestamp(t);
       stream->Write(m);
     }
 };
@@ -103,7 +107,12 @@ class SNSServiceImpl final : public SNSService::Service {
     // LIST request from the user. Ensure that both the fields
     // all_users & following_users are populated
     // ------------------------------------------------------------
-    user_t* req_u = db.at(request->username());
+    user_t* req_u;
+    try{ req_u = db.at(request->username()); } catch (const std::out_of_range& oor) 
+    {
+      reply->set_msg("5");
+      return Status::OK;
+    }
     
     for (auto pu : db){ //all_users
       std::string name = pu.first;
@@ -115,6 +124,7 @@ class SNSServiceImpl final : public SNSService::Service {
       reply->add_following_users(name);
     }
     
+    reply->set_msg("0");
     return Status::OK;
   }
 
@@ -124,18 +134,27 @@ class SNSServiceImpl final : public SNSService::Service {
     // request from a user to follow one of the existing
     // users
     // ------------------------------------------------------------
-    try{
-      user_t* req_u = db.at(request->username());
-      user_t* fol_u = db.at(request->arguments(0)); //I'm assuming its zero indexed?
-      if (!fol_u->add_follower(req_u)){
-        //return Status::ALREADY_EXISTS;
-        return Status::CANCELLED;
-      }
-    } catch (const std::out_of_range& oor) {
-      //return Status::NOT_FOUND;
-        return Status::CANCELLED;
+    user_t* req_u;
+    user_t* fol_u;
+    try{ req_u = db.at(request->username()); } catch (const std::out_of_range& oor) 
+    {
+      reply->set_msg("5");
+      return Status::OK;
     }
     
+    try{ fol_u = db.at(request->arguments(0)); } catch (const std::out_of_range& oor)
+    {
+      reply->set_msg("3");
+      return Status::OK;
+    }
+    
+    if (!fol_u->add_follower(req_u))
+    {
+      reply->set_msg("1");
+      return Status::OK;
+    }
+    
+    reply->set_msg("0");
     return Status::OK; 
   }
 
@@ -145,18 +164,30 @@ class SNSServiceImpl final : public SNSService::Service {
     // request from a user to unfollow one of his/her existing
     // followers
     // ------------------------------------------------------------
-    try{
-      user_t* req_u = db.at(request->username());
-      user_t* ufl_u = db.at(request->arguments(0)); //I'm assuming its zero indexed?
-      if (!ufl_u->rem_follower(req_u)){
-        //return Status::NOT_FOUND;
-        return Status::CANCELLED;
-      }
-    } catch (const std::out_of_range& oor) {
-      //return Status::NOT_FOUND;
-        return Status::CANCELLED;
+    
+    user_t* req_u;
+    user_t* ufl_u;
+    try{ req_u = db.at(request->username()); } catch (const std::out_of_range& oor) 
+    {
+      reply->set_msg("5"); //Error unknown
+      return Status::OK;
     }
+    
+    try{ ufl_u = db.at(request->arguments(0)); } catch (const std::out_of_range& oor)
+    {
+      reply->set_msg("3"); //Bad username
+      return Status::OK;
+    }
+    
+    if (!ufl_u->rem_follower(req_u))
+    {
+      reply->set_msg("3"); //Not following
+      return Status::OK;
+    }
+    
+    reply->set_msg("0");
     return Status::OK; 
+    
   }
   
   Status Login(ServerContext* context, const Request* request, Reply* reply) override {
