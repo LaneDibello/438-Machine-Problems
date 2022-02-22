@@ -85,7 +85,7 @@ class user_t {
     }
     
     void notify_post(std::string username, std::string msg, std::string t_str) {
-      if (!streambound) return; //Figure this out
+      if (!streambound || username == name) return; //Figure this out
       timeline << username << "(" << t_str << ") >> " << msg << std::endl;;
       Message m;
       m.set_msg(msg);
