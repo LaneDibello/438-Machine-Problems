@@ -6,12 +6,15 @@
 #include <fstream>
 //#include <google/protobuf/util/status.h>
 #include <iostream>
+#include <sstream>
+#include <cstdio>
 #include <stdexcept>
 #include <vector>
 #include <map>
 #include <queue>
 #include <algorithm>
 #include <memory>
+#include <signal.h>
 #include <string>
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,17 +42,20 @@ class user_t {
   public:
     std::string name;
     std::map<std::string, user_t*> following; //maybe user_t* instead
-    std::ofstream timeline; 
-    std::queue<std::string> msg_q;
+    //std::fstream timeline;
     ServerReaderWriter<Message, Message>* stream;
     bool streambound = false;
+    std::vector<std::string> temp_unames;
+    bool loggedIn = true;
     
     user_t(std::string un) {
       name = un;
       //following();
-      timeline.open ("Timelines/" + name + ".tml", std::ofstream::out | std::ofstream::app);
-      std::cout << "New client: " << name << std::endl;
+      //std::cout << "New client: " << name << std::endl;
       add_follower(this);
+      
+      
+      //timeline.open ("Timelines/" + name + ".tml", std::ofstream::out | std::ofstream::app);
       
     }
     
@@ -72,9 +78,11 @@ class user_t {
     void post_timeline(std::string msg, std::time_t& time){
       std::string t_str(std::ctime(&time));
       //t_str[t_str.size()-1] = '\0';
+      t_str = t_str.substr(0, t_str.size()-1);
       std::string line = name + "(" + t_str + ") >> " + msg;
+      std::fstream timeline ("Timelines/" + name + ".tml", std::ofstream::app);
       timeline << line;
-      
+      timeline.close();
       for (auto u : following){
         
         u.second->notify_post(name, msg, t_str);
@@ -85,8 +93,15 @@ class user_t {
     }
     
     void notify_post(std::string username, std::string msg, std::string t_str) {
-      if (!streambound || username == name) return; //Figure this out
-      timeline << username << "(" << t_str << ") >> " << msg << std::endl;;
+      if (username == name) return;
+      std::fstream timeline ("Timelines/" + name + ".tml", std::ofstream::app);
+      if (!streambound) {
+        timeline << username << "(" << t_str << ") >> " << msg;
+        timeline.close();
+        return;
+      }
+      timeline << username << "(" << t_str << ") >> " << msg << std::endl;
+      timeline.close();
       Message m;
       m.set_msg(msg);
       m.set_username(username);
@@ -95,11 +110,30 @@ class user_t {
       *ts = TimeUtil::TimeTToTimestamp(t);
       stream->Write(m);
     }
+    
+    void close_user(std::ofstream& u_dmp) {
+      stream = nullptr;
+      streambound = false;
+      //timeline.close();
+      
+      u_dmp << name;
+      for (auto i : following){
+        u_dmp << ' ' << i.first;
+      }
+      u_dmp << std::endl;
+    }
+    
+    void grabFollowers(std::map<std::string, user_t*>* db){
+      for (auto f : temp_unames){
+        add_follower(db->at(f));
+      }
+      temp_unames.clear();
+    }
 };
 
+std::map<std::string, user_t*> db;
+
 class SNSServiceImpl final : public SNSService::Service {
-  
-  std::map<std::string, user_t*> db;
   
   Status List(ServerContext* context, const Request* request, Reply* reply) override {
     // ------------------------------------------------------------
@@ -202,7 +236,11 @@ class SNSServiceImpl final : public SNSService::Service {
     if (!ret.second){
       delete u;
       //return Status::ALREADY_EXISTS;
-        return Status::CANCELLED;
+      if (!db.at(name)->loggedIn) {
+        db.at(name)->loggedIn = true;
+        return Status::OK;
+      }
+      return Status::CANCELLED;
     }
     
     return Status::OK;
@@ -242,7 +280,42 @@ class SNSServiceImpl final : public SNSService::Service {
     return Status::OK;
   }
 
+  public:
+    static void signal_callback_handler(int signum) {
+      std::ofstream user_dump("user.dmp");
+      for (auto i : db) {
+        i.second->close_user(user_dump);
+      }
+      user_dump.close();
+      exit(0);
+    }
+  
+    void parse_dump(){
+      std::ifstream user_dump("user.dmp");
+      while (!user_dump.eof() && !user_dump.fail()) {
+        std::string uline;
+        std::getline(user_dump, uline);
+        std::stringstream ss(uline);
+        std::string uname;
+        ss >> uname;
+        user_t* u = new user_t(uname);
+        u->loggedIn = false;
+        while (!ss.eof()) {
+          std::string f;
+          ss >> f;
+          u->temp_unames.push_back(f);
+        }
+        db.insert(std::pair<std::string, user_t*>(uname, u));
+      }
+      for (auto i : db){
+        i.second->grabFollowers(&db);
+      }
+      user_dump.close();
+      std::remove("user.dmp");
+    }
 };
+
+
 
 void RunServer(std::string port_no) {
   // ------------------------------------------------------------
@@ -252,6 +325,8 @@ void RunServer(std::string port_no) {
   // ------------------------------------------------------------
   std::string server_address("localhost:"+port_no); //Uh is this the right address?
   SNSServiceImpl service;
+  
+  service.parse_dump();
   
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -263,6 +338,8 @@ void RunServer(std::string port_no) {
 
 int main(int argc, char** argv) {
   
+  signal(SIGINT, SNSServiceImpl::signal_callback_handler);
+
   std::string port = "3010";
   int opt = 0;
   while ((opt = getopt(argc, argv, "p:")) != -1){

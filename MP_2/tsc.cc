@@ -4,7 +4,10 @@
 #include <google/protobuf/duration.pb.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <queue>
+#include <stack>
 #include <unistd.h>
 #include <grpc++/grpc++.h>
 #include <google/protobuf/util/time_util.h>
@@ -197,6 +200,20 @@ void Client::processTimeline()
 	ClientContext context;
 	
     std::shared_ptr<ClientReaderWriter<Message, Message>> stream(stub_->Timeline(&context));
+    
+    std::ifstream tin("Timelines/" + username + ".tml");
+    std::stack<std::string> msg_q;
+    while (!tin.eof()){
+      std::string pline;
+      getline(tin, pline);
+      if (pline.size() < 2) break;
+      msg_q.push(pline);
+    }
+    for (int i = 0; !msg_q.empty() && i < 20; i++) {
+        std::cout << msg_q.top() << std::endl;
+        msg_q.pop();
+    }
+      
     
     //Send join msg
     Message m;
