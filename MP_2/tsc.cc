@@ -201,7 +201,7 @@ void Client::processTimeline()
 	
     std::shared_ptr<ClientReaderWriter<Message, Message>> stream(stub_->Timeline(&context));
     
-    std::ifstream tin("Timelines/" + username + ".tml");
+    std::ifstream tin("tml_" + username + ".txt");
     std::stack<std::string> msg_q;
     while (!tin.eof()){
       std::string pline;

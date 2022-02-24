@@ -54,8 +54,7 @@ class user_t {
       //std::cout << "New client: " << name << std::endl;
       add_follower(this);
       
-      
-      //timeline.open ("Timelines/" + name + ".tml", std::ofstream::out | std::ofstream::app);
+      //timeline.open ("Timelines/" + name + ".txt", std::ofstream::out | std::ofstream::app);
       
     }
     
@@ -64,14 +63,14 @@ class user_t {
     }
     
     bool add_follower(user_t* u){
-      std::cout << name << " following " << u->name << std::endl;
+      //std::cout << name << " following " << u->name << std::endl;
       auto ret = following.insert(std::pair<std::string, user_t*>(u->name, u));
       return ret.second;
     }
     
     bool rem_follower(user_t* u){
       if (u->name == name) { return false; }
-      std::cout << name << " unfollowing " << u->name << std::endl;
+      //std::cout << name << " unfollowing " << u->name << std::endl;
       return following.erase(u->name);
     }
     
@@ -80,7 +79,7 @@ class user_t {
       //t_str[t_str.size()-1] = '\0';
       t_str = t_str.substr(0, t_str.size()-1);
       std::string line = name + "(" + t_str + ") >> " + msg;
-      std::fstream timeline ("Timelines/" + name + ".tml", std::ofstream::app);
+      std::fstream timeline ("tml_" + name + ".txt", std::ofstream::app);
       timeline << line;
       timeline.close();
       for (auto u : following){
@@ -88,13 +87,13 @@ class user_t {
         u.second->notify_post(name, msg, t_str);
       }
       
-      std::cout << "msg \"" << line << "\" sent from " << name << std::endl;
+      //std::cout << "msg \"" << line << "\" sent from " << name << std::endl;
       
     }
     
     void notify_post(std::string username, std::string msg, std::string t_str) {
       if (username == name) return;
-      std::fstream timeline ("Timelines/" + name + ".tml", std::ofstream::app);
+      std::fstream timeline ("tml_" + name + ".txt", std::ofstream::app);
       if (!streambound) {
         timeline << username << "(" << t_str << ") >> " << msg;
         timeline.close();
@@ -282,7 +281,7 @@ class SNSServiceImpl final : public SNSService::Service {
 
   public:
     static void signal_callback_handler(int signum) {
-      std::ofstream user_dump("user.dmp");
+      std::ofstream user_dump("user.txt");
       for (auto i : db) {
         i.second->close_user(user_dump);
       }
@@ -291,7 +290,7 @@ class SNSServiceImpl final : public SNSService::Service {
     }
   
     void parse_dump(){
-      std::ifstream user_dump("user.dmp");
+      std::ifstream user_dump("user.txt");
       while (!user_dump.eof() && !user_dump.fail()) {
         std::string uline;
         std::getline(user_dump, uline);
@@ -311,7 +310,7 @@ class SNSServiceImpl final : public SNSService::Service {
         i.second->grabFollowers(&db);
       }
       user_dump.close();
-      std::remove("user.dmp");
+      std::remove("user.txt");
     }
 };
 
@@ -323,7 +322,7 @@ void RunServer(std::string port_no) {
   // which would start the server, make it listen on a particular
   // port number.
   // ------------------------------------------------------------
-  std::string server_address("localhost:"+port_no); //Uh is this the right address?
+  std::string server_address("0.0.0.0:"+port_no); //Uh is this the right address?
   SNSServiceImpl service;
   
   service.parse_dump();
