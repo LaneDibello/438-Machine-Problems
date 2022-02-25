@@ -294,6 +294,9 @@ class SNSServiceImpl final : public SNSService::Service {
       while (!user_dump.eof() && !user_dump.fail()) {
         std::string uline;
         std::getline(user_dump, uline);
+        if (uline.size() < 1) {
+          continue;
+        }
         std::stringstream ss(uline);
         std::string uname;
         ss >> uname;

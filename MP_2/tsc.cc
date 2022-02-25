@@ -206,7 +206,7 @@ void Client::processTimeline()
     while (!tin.eof()){
       std::string pline;
       getline(tin, pline);
-      if (pline.size() < 2) break;
+      if (pline.size() < 2) continue;
       msg_q.push(pline);
     }
     for (int i = 0; !msg_q.empty() && i < 20; i++) {
