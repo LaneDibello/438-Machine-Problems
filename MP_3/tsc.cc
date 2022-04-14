@@ -20,6 +20,13 @@ using csce438::Request;
 using csce438::Reply;
 using csce438::SNSService;
 
+//Coord info
+std::string c_hostname;
+std::string c_port;
+
+//Meta Client Info
+int c_id;
+
 Message MakeMessage(const std::string& username, const std::string& msg) {
     Message m;
     m.set_username(username);
@@ -60,26 +67,50 @@ class Client : public IClient
 
 };
 
+void printUsage(std::string arg = ""){
+  if (arg != "") {std::cerr << "Bad argument: " << arg << endl;}
+  std::cerr << "Usage:" << std::endl;
+  std::cerr << "$./client -cip <coordinatorIP> -cp <coordinatorPort> -id <clientId>" << std::endl;
+
+  exit(1);  
+}
+
 int main(int argc, char** argv) {
 
-    std::string hostname = "localhost";
-    std::string username = "default";
-    std::string port = "3010";
-    int opt = 0;
-    while ((opt = getopt(argc, argv, "h:u:p:")) != -1){
-        switch(opt) {
-            case 'h':
-                hostname = optarg;break;
-            case 'u':
-                username = optarg;break;
-            case 'p':
-                port = optarg;break;
-            default:
-                std::cerr << "Invalid Command Line Argument\n";
-        }
+    if (argc != 7) {
+        printUsage();
     }
 
-    Client myc(hostname, username, port);
+    c_hostname = "localhost";
+    c_port = "3010";
+    c_id = -1;
+    
+    for(int i = 1; i < argc; i++){
+      std::string arg(argv[i]);
+  
+      if (argc == i+1) {
+        printUsage(arg);
+      }
+      
+      if (arg == "-cip"){
+        c_hostname = argv[i+1];
+      }
+      else if (arg == "-cp"){
+        c_port = argv[i+1];
+        if (c_port.size() > 6) printUsage(arg);
+      }
+      else if (arg == "-id"){
+        f_id = atoi(argv[i+1]);
+        if (f_id < 0) {
+          printUsage(arg);
+        }
+      }
+    }
+    
+    
+    std::string username = "u" + std::to_string(c_id);
+
+    Client myc(c_hostname, username, port);
     // You MUST invoke "run_client" function to start business logic
     myc.run_client();
 
@@ -88,15 +119,6 @@ int main(int argc, char** argv) {
 
 int Client::connectTo()
 {
-	// ------------------------------------------------------------
-    // In this function, you are supposed to create a stub so that
-    // you call service methods in the processCommand/porcessTimeline
-    // functions. That is, the stub should be accessible when you want
-    // to call any service methods in those functions.
-    // I recommend you to have the stub as
-    // a member variable in your own Client class.
-    // Please refer to gRpc tutorial how to create a stub.
-	// ------------------------------------------------------------
     std::string login_info = hostname + ":" + port;
     stub_ = std::unique_ptr<SNSService::Stub>(SNSService::NewStub(
                grpc::CreateChannel(
@@ -111,52 +133,6 @@ int Client::connectTo()
 
 IReply Client::processCommand(std::string& input)
 {
-	// ------------------------------------------------------------
-	// GUIDE 1:
-	// In this function, you are supposed to parse the given input
-    // command and create your own message so that you call an 
-    // appropriate service method. The input command will be one
-    // of the followings:
-	//
-	// FOLLOW <username>
-	// UNFOLLOW <username>
-	// LIST
-    // TIMELINE
-	//
-	// - JOIN/LEAVE and "<username>" are separated by one space.
-	// ------------------------------------------------------------
-	
-    // ------------------------------------------------------------
-	// GUIDE 2:
-	// Then, you should create a variable of IReply structure
-	// provided by the client.h and initialize it according to
-	// the result. Finally you can finish this function by returning
-    // the IReply.
-	// ------------------------------------------------------------
-    
-    
-	// ------------------------------------------------------------
-    // HINT: How to set the IReply?
-    // Suppose you have "Join" service method for JOIN command,
-    // IReply can be set as follow:
-    // 
-    //     // some codes for creating/initializing parameters for
-    //     // service method
-    //     IReply ire;
-    //     grpc::Status status = stub_->Join(&context, /* some parameters */);
-    //     ire.grpc_status = status;
-    //     if (status.ok()) {
-    //         ire.comm_status = SUCCESS;
-    //     } else {
-    //         ire.comm_status = FAILURE_NOT_EXISTS;
-    //     }
-    //      
-    //      return ire;
-    // 
-    // IMPORTANT: 
-    // For the command "LIST", you should set both "all_users" and 
-    // "following_users" member variable of IReply.
-	// ------------------------------------------------------------
     IReply ire;
     std::size_t index = input.find_first_of(" ");
     if (index != std::string::npos) {
@@ -192,22 +168,6 @@ IReply Client::processCommand(std::string& input)
 void Client::processTimeline()
 {
     Timeline(username);
-	// ------------------------------------------------------------
-    // In this function, you are supposed to get into timeline mode.
-    // You may need to call a service method to communicate with
-    // the server. Use getPostMessage/displayPostMessage functions
-    // for both getting and displaying messages in timeline mode.
-    // You should use them as you did in hw1.
-	// ------------------------------------------------------------
-
-    // ------------------------------------------------------------
-    // IMPORTANT NOTICE:
-    //
-    // Once a user enter to timeline mode , there is no way
-    // to command mode. You don't have to worry about this situation,
-    // and you can terminate the client program by pressing
-    // CTRL-C (SIGINT)
-	// ------------------------------------------------------------
 }
 
 IReply Client::List() {

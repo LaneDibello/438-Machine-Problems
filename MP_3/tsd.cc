@@ -1,36 +1,3 @@
-/*
- *
- * Copyright 2015, Google Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- *     * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer
- * in the documentation and/or other materials provided with the
- * distribution.
- *     * Neither the name of Google Inc. nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
 #include <ctime>
 
 #include <google/protobuf/timestamp.pb.h>
@@ -49,6 +16,11 @@
 
 using google::protobuf::Timestamp;
 using google::protobuf::Duration;
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::ClientReader;
+using grpc::ClientReaderWriter;
+using grpc::ClientWriter;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
@@ -73,6 +45,14 @@ struct Client {
     return (username == c1.username);
   }
 };
+
+//Coord info
+std::string c_hostname;
+std::string c_port;
+
+//Meta Server info
+int s_id;
+bool isMaster;
 
 //Vector that stores every client that has been created
 std::vector<Client> client_db;
@@ -232,9 +212,14 @@ class SNSServiceImpl final : public SNSService::Service {
 
 };
 
+std::unique_ptr<SNSCoord::Stub> getStub(){
+  //Uses coordinate IP info to connect to it and send the necessary RPC messages
+}
+
 void RunServer(std::string port_no) {
   std::string server_address = "0.0.0.0:"+port_no;
   SNSServiceImpl service;
+  
 
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -245,19 +230,80 @@ void RunServer(std::string port_no) {
   server->Wait();
 }
 
+void printUsage(std::string arg = ""){
+  if (arg != "") {std::cerr << "Bad argument: " << arg << endl;}
+  std::cerr << "Usage:" << std::endl;
+  std::cerr << "$./server -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <idNum> -t <master/slave>" << std::endl;
+
+  exit(1);  
+}
+
 int main(int argc, char** argv) {
   
+  if (argc != 11) {
+    printUsage();
+  }
+  
   std::string port = "3010";
-  int opt = 0;
-  while ((opt = getopt(argc, argv, "p:")) != -1){
-    switch(opt) {
-      case 'p':
-          port = optarg;break;
-      default:
-	  std::cerr << "Invalid Command Line Argument\n";
+  
+  c_hostname = "";
+  c_port = "";
+  s_id = -1;
+  isMaster = false;
+
+  
+  for(int i = 1; i < argc; i++){
+    std::string arg(argv[i]);
+    
+    if (argc == i+1) {
+      printUsage(arg);
+    }
+    
+    if (arg == "-cip"){
+      c_hostname = argv[i+1];
+    }
+    else if (arg == "-cp"){
+      c_port = argv[i+1];
+      if (c_port.size() > 6) printUsage(arg);
+    }
+    else if (arg == "-p"){
+      port = argv[i+1];
+      if (port.size() > 6) printUsage(arg);
+    }
+    else if (arg == "-id"){
+      s_id = atoi(argv[i+1]);
+      if (s_id < 0) {
+        printUsage(arg);
+      }
+    }
+    else if (arg == "-t"){
+      std::string op(argv[i+1]);
+      if (op == "master") isMaster = true;
+      else if (op == "slave") isMaster = false;
+      else printUsage(arg);
     }
   }
+  
   RunServer(port);
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

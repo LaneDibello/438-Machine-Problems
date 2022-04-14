@@ -47,7 +47,7 @@ struct TableStruct_sns_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -55,6 +55,9 @@ struct TableStruct_sns_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto;
 namespace csce438 {
+class ClusterInfo;
+struct ClusterInfoDefaultTypeInternal;
+extern ClusterInfoDefaultTypeInternal _ClusterInfo_default_instance_;
 class ListReply;
 struct ListReplyDefaultTypeInternal;
 extern ListReplyDefaultTypeInternal _ListReply_default_instance_;
@@ -69,6 +72,7 @@ struct RequestDefaultTypeInternal;
 extern RequestDefaultTypeInternal _Request_default_instance_;
 }  // namespace csce438
 PROTOBUF_NAMESPACE_OPEN
+template<> ::csce438::ClusterInfo* Arena::CreateMaybeMessage<::csce438::ClusterInfo>(Arena*);
 template<> ::csce438::ListReply* Arena::CreateMaybeMessage<::csce438::ListReply>(Arena*);
 template<> ::csce438::Message* Arena::CreateMaybeMessage<::csce438::Message>(Arena*);
 template<> ::csce438::Reply* Arena::CreateMaybeMessage<::csce438::Reply>(Arena*);
@@ -766,6 +770,170 @@ class Message final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sns_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ClusterInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:csce438.ClusterInfo) */ {
+ public:
+  inline ClusterInfo() : ClusterInfo(nullptr) {}
+  ~ClusterInfo() override;
+  explicit constexpr ClusterInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  ClusterInfo(const ClusterInfo& from);
+  ClusterInfo(ClusterInfo&& from) noexcept
+    : ClusterInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline ClusterInfo& operator=(const ClusterInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ClusterInfo& operator=(ClusterInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ClusterInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ClusterInfo* internal_default_instance() {
+    return reinterpret_cast<const ClusterInfo*>(
+               &_ClusterInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  friend void swap(ClusterInfo& a, ClusterInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ClusterInfo* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ClusterInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ClusterInfo* New() const final {
+    return new ClusterInfo();
+  }
+
+  ClusterInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ClusterInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const ClusterInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const ClusterInfo& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ClusterInfo* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "csce438.ClusterInfo";
+  }
+  protected:
+  explicit ClusterInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kAddrFieldNumber = 1,
+    kPortFieldNumber = 2,
+  };
+  // string addr = 1;
+  void clear_addr();
+  const std::string& addr() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_addr(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_addr();
+  PROTOBUF_MUST_USE_RESULT std::string* release_addr();
+  void set_allocated_addr(std::string* addr);
+  private:
+  const std::string& _internal_addr() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_addr(const std::string& value);
+  std::string* _internal_mutable_addr();
+  public:
+
+  // string port = 2;
+  void clear_port();
+  const std::string& port() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_port(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_port();
+  PROTOBUF_MUST_USE_RESULT std::string* release_port();
+  void set_allocated_port(std::string* port);
+  private:
+  const std::string& _internal_port() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_port(const std::string& value);
+  std::string* _internal_mutable_port();
+  public:
+
+  // @@protoc_insertion_point(class_scope:csce438.ClusterInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr addr_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr port_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sns_2eproto;
+};
 // ===================================================================
 
 
@@ -1284,9 +1452,107 @@ inline void Message::set_allocated_timestamp(::PROTOBUF_NAMESPACE_ID::Timestamp*
   // @@protoc_insertion_point(field_set_allocated:csce438.Message.timestamp)
 }
 
+// -------------------------------------------------------------------
+
+// ClusterInfo
+
+// string addr = 1;
+inline void ClusterInfo::clear_addr() {
+  addr_.ClearToEmpty();
+}
+inline const std::string& ClusterInfo::addr() const {
+  // @@protoc_insertion_point(field_get:csce438.ClusterInfo.addr)
+  return _internal_addr();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void ClusterInfo::set_addr(ArgT0&& arg0, ArgT... args) {
+ 
+ addr_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:csce438.ClusterInfo.addr)
+}
+inline std::string* ClusterInfo::mutable_addr() {
+  std::string* _s = _internal_mutable_addr();
+  // @@protoc_insertion_point(field_mutable:csce438.ClusterInfo.addr)
+  return _s;
+}
+inline const std::string& ClusterInfo::_internal_addr() const {
+  return addr_.Get();
+}
+inline void ClusterInfo::_internal_set_addr(const std::string& value) {
+  
+  addr_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* ClusterInfo::_internal_mutable_addr() {
+  
+  return addr_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* ClusterInfo::release_addr() {
+  // @@protoc_insertion_point(field_release:csce438.ClusterInfo.addr)
+  return addr_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void ClusterInfo::set_allocated_addr(std::string* addr) {
+  if (addr != nullptr) {
+    
+  } else {
+    
+  }
+  addr_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), addr,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:csce438.ClusterInfo.addr)
+}
+
+// string port = 2;
+inline void ClusterInfo::clear_port() {
+  port_.ClearToEmpty();
+}
+inline const std::string& ClusterInfo::port() const {
+  // @@protoc_insertion_point(field_get:csce438.ClusterInfo.port)
+  return _internal_port();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void ClusterInfo::set_port(ArgT0&& arg0, ArgT... args) {
+ 
+ port_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:csce438.ClusterInfo.port)
+}
+inline std::string* ClusterInfo::mutable_port() {
+  std::string* _s = _internal_mutable_port();
+  // @@protoc_insertion_point(field_mutable:csce438.ClusterInfo.port)
+  return _s;
+}
+inline const std::string& ClusterInfo::_internal_port() const {
+  return port_.Get();
+}
+inline void ClusterInfo::_internal_set_port(const std::string& value) {
+  
+  port_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* ClusterInfo::_internal_mutable_port() {
+  
+  return port_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* ClusterInfo::release_port() {
+  // @@protoc_insertion_point(field_release:csce438.ClusterInfo.port)
+  return port_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void ClusterInfo::set_allocated_port(std::string* port) {
+  if (port != nullptr) {
+    
+  } else {
+    
+  }
+  port_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), port,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:csce438.ClusterInfo.port)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

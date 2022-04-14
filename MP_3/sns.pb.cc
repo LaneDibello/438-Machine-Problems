@@ -69,8 +69,21 @@ struct MessageDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT MessageDefaultTypeInternal _Message_default_instance_;
+constexpr ClusterInfo::ClusterInfo(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : addr_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , port_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+struct ClusterInfoDefaultTypeInternal {
+  constexpr ClusterInfoDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~ClusterInfoDefaultTypeInternal() {}
+  union {
+    ClusterInfo _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ClusterInfoDefaultTypeInternal _ClusterInfo_default_instance_;
 }  // namespace csce438
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_sns_2eproto[4];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_sns_2eproto[5];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_sns_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_sns_2eproto = nullptr;
 
@@ -107,12 +120,21 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_sns_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::csce438::Message, username_),
   PROTOBUF_FIELD_OFFSET(::csce438::Message, msg_),
   PROTOBUF_FIELD_OFFSET(::csce438::Message, timestamp_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, addr_),
+  PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, port_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::csce438::ListReply)},
   { 8, -1, -1, sizeof(::csce438::Request)},
   { 16, -1, -1, sizeof(::csce438::Reply)},
   { 23, -1, -1, sizeof(::csce438::Message)},
+  { 32, -1, -1, sizeof(::csce438::ClusterInfo)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -120,6 +142,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::csce438::_Request_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::csce438::_Reply_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::csce438::_Message_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::csce438::_ClusterInfo_default_instance_),
 };
 
 const char descriptor_table_protodef_sns_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -129,22 +152,26 @@ const char descriptor_table_protodef_sns_2eproto[] PROTOBUF_SECTION_VARIABLE(pro
   "sername\030\001 \001(\t\022\021\n\targuments\030\002 \003(\t\"\024\n\005Repl"
   "y\022\013\n\003msg\030\001 \001(\t\"W\n\007Message\022\020\n\010username\030\001 "
   "\001(\t\022\013\n\003msg\030\002 \001(\t\022-\n\ttimestamp\030\003 \001(\0132\032.go"
-  "ogle.protobuf.Timestamp2\375\001\n\nSNSService\022+"
-  "\n\005Login\022\020.csce438.Request\032\016.csce438.Repl"
-  "y\"\000\022.\n\004List\022\020.csce438.Request\032\022.csce438."
-  "ListReply\"\000\022,\n\006Follow\022\020.csce438.Request\032"
-  "\016.csce438.Reply\"\000\022.\n\010UnFollow\022\020.csce438."
-  "Request\032\016.csce438.Reply\"\000\0224\n\010Timeline\022\020."
-  "csce438.Message\032\020.csce438.Message\"\000(\0010\001b"
-  "\006proto3"
+  "ogle.protobuf.Timestamp\")\n\013ClusterInfo\022\014"
+  "\n\004addr\030\001 \001(\t\022\014\n\004port\030\002 \001(\t2\375\001\n\nSNSServic"
+  "e\022+\n\005Login\022\020.csce438.Request\032\016.csce438.R"
+  "eply\"\000\022.\n\004List\022\020.csce438.Request\032\022.csce4"
+  "38.ListReply\"\000\022,\n\006Follow\022\020.csce438.Reque"
+  "st\032\016.csce438.Reply\"\000\022.\n\010UnFollow\022\020.csce4"
+  "38.Request\032\016.csce438.Reply\"\000\0224\n\010Timeline"
+  "\022\020.csce438.Message\032\020.csce438.Message\"\000(\001"
+  "0\0012}\n\010SNSCoord\0226\n\014ClusterSpawn\022\024.csce438"
+  ".ClusterInfo\032\016.csce438.Reply\"\000\0229\n\rGetCon"
+  "nection\022\020.csce438.Request\032\024.csce438.Clus"
+  "terInfo\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_sns_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sns_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto = {
-  false, false, 527, descriptor_table_protodef_sns_2eproto, "sns.proto", 
-  &descriptor_table_sns_2eproto_once, descriptor_table_sns_2eproto_deps, 1, 4,
+  false, false, 697, descriptor_table_protodef_sns_2eproto, "sns.proto", 
+  &descriptor_table_sns_2eproto_once, descriptor_table_sns_2eproto_deps, 1, 5,
   schemas, file_default_instances, TableStruct_sns_2eproto::offsets,
   file_level_metadata_sns_2eproto, file_level_enum_descriptors_sns_2eproto, file_level_service_descriptors_sns_2eproto,
 };
@@ -1105,6 +1132,246 @@ void Message::InternalSwap(Message* other) {
       file_level_metadata_sns_2eproto[3]);
 }
 
+// ===================================================================
+
+class ClusterInfo::_Internal {
+ public:
+};
+
+ClusterInfo::ClusterInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:csce438.ClusterInfo)
+}
+ClusterInfo::ClusterInfo(const ClusterInfo& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  addr_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_addr().empty()) {
+    addr_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_addr(), 
+      GetArenaForAllocation());
+  }
+  port_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_port().empty()) {
+    port_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_port(), 
+      GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(copy_constructor:csce438.ClusterInfo)
+}
+
+void ClusterInfo::SharedCtor() {
+addr_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+port_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+ClusterInfo::~ClusterInfo() {
+  // @@protoc_insertion_point(destructor:csce438.ClusterInfo)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void ClusterInfo::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  addr_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  port_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void ClusterInfo::ArenaDtor(void* object) {
+  ClusterInfo* _this = reinterpret_cast< ClusterInfo* >(object);
+  (void)_this;
+}
+void ClusterInfo::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void ClusterInfo::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void ClusterInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:csce438.ClusterInfo)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  addr_.ClearToEmpty();
+  port_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* ClusterInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string addr = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_addr();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "csce438.ClusterInfo.addr"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string port = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_port();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "csce438.ClusterInfo.port"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* ClusterInfo::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:csce438.ClusterInfo)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string addr = 1;
+  if (!this->_internal_addr().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_addr().data(), static_cast<int>(this->_internal_addr().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "csce438.ClusterInfo.addr");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_addr(), target);
+  }
+
+  // string port = 2;
+  if (!this->_internal_port().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_port().data(), static_cast<int>(this->_internal_port().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "csce438.ClusterInfo.port");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_port(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:csce438.ClusterInfo)
+  return target;
+}
+
+size_t ClusterInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:csce438.ClusterInfo)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string addr = 1;
+  if (!this->_internal_addr().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_addr());
+  }
+
+  // string port = 2;
+  if (!this->_internal_port().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_port());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData ClusterInfo::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    ClusterInfo::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*ClusterInfo::GetClassData() const { return &_class_data_; }
+
+void ClusterInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<ClusterInfo *>(to)->MergeFrom(
+      static_cast<const ClusterInfo &>(from));
+}
+
+
+void ClusterInfo::MergeFrom(const ClusterInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:csce438.ClusterInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_addr().empty()) {
+    _internal_set_addr(from._internal_addr());
+  }
+  if (!from._internal_port().empty()) {
+    _internal_set_port(from._internal_port());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ClusterInfo::CopyFrom(const ClusterInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:csce438.ClusterInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ClusterInfo::IsInitialized() const {
+  return true;
+}
+
+void ClusterInfo::InternalSwap(ClusterInfo* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &addr_, lhs_arena,
+      &other->addr_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &port_, lhs_arena,
+      &other->port_, rhs_arena
+  );
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata ClusterInfo::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_sns_2eproto_getter, &descriptor_table_sns_2eproto_once,
+      file_level_metadata_sns_2eproto[4]);
+}
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace csce438
 PROTOBUF_NAMESPACE_OPEN
@@ -1119,6 +1386,9 @@ template<> PROTOBUF_NOINLINE ::csce438::Reply* Arena::CreateMaybeMessage< ::csce
 }
 template<> PROTOBUF_NOINLINE ::csce438::Message* Arena::CreateMaybeMessage< ::csce438::Message >(Arena* arena) {
   return Arena::CreateMessageInternal< ::csce438::Message >(arena);
+}
+template<> PROTOBUF_NOINLINE ::csce438::ClusterInfo* Arena::CreateMaybeMessage< ::csce438::ClusterInfo >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::csce438::ClusterInfo >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

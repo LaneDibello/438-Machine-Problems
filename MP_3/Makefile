@@ -16,13 +16,23 @@ PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
-all: system-check tsc tsd 
+all: system-check tsc tsd tsf tso
 
+#Client recipe
 tsc: sns.pb.o sns.grpc.pb.o tsc.o
-	$(CXX) $^ $(LDFLAGS) -g -o $@
+	$(CXX) $^ $(LDFLAGS) -g -o client
 
+#Daemon "Server" recipe
 tsd: sns.pb.o sns.grpc.pb.o tsd.o
-	$(CXX) $^ $(LDFLAGS) -g -o $@
+	$(CXX) $^ $(LDFLAGS) -g -o server
+
+#Follower recipe
+tsf: sns.pb.o sns.grpc.pb.o tsf.o
+	$(CXX) $^ $(LDFLAGS) -g -o synchronizer
+
+#Coordinator recipe
+tso: sns.pb.o sns.grpc.pb.o tsf.o
+	$(CXX) $^ $(LDFLAGS) -g -o coordinator
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
