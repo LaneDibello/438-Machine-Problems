@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <set>
 #include <stdlib.h>
 #include <unistd.h>
 #include <google/protobuf/util/time_util.h>
@@ -22,19 +23,45 @@ using grpc::ClientReader;
 using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
 using grpc::Status;
-// using csce438::Message;
-// using csce438::ListReply;
-// using csce438::Request;
-// using csce438::Reply;
-// using csce438::SNSService;
+using grpc::Server;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+using grpc::ServerReader;
+using grpc::ServerReaderWriter;
+using grpc::ServerWriter;
 
 using namespace csce438;
+
 // Coord info
 std::string c_hostname;
 std::string c_port;
 
 // Meta Follower info
 int f_id;
+int s_id;
+std::set<int> client_ids;
+
+class SNSFollowerImpl final : public SNSFollower::Service{
+    Status Following(ServerContext *context, const FollowPair* request, Blep* response) override {
+        int fid = request->fid();
+        if(client_ids.count(fid)){
+            std::ofstream fol_s (std::to_string(fid) + "following.txt", std::ios::app | std::ios::out | std::ios::in);
+            fol_s << request->id() << ",";
+            fol_s.close();
+        }
+        else{
+            std::cerr << "Following:\n";
+            std::cerr << "Client with ID '" << fid << "' is not managed by this follower, ID: '" << f_id << "'\n";
+            std::cerr << "Did the coordinator screw up?\n";
+            return Status::CANCELLED;
+        }
+        return Status::OK;
+    }
+    Status newClient(ServerContext *context, const JoinReq* request, Blep* response) override {
+        client_ids.insert(request->id());
+        return Status::OK;
+    }
+};
 
 void printUsage(std::string arg = "")
 {

@@ -27,7 +27,7 @@ std::string c_port;
 // Meta Client Info
 int c_id;
 
-Message MakeMessage(const std::string &username, const std::string &msg)
+Message MakeMessage(const int &username, const std::string &msg)
 {
     Message m;
     m.set_username(username);
@@ -43,7 +43,7 @@ class Client : public IClient
 {
 public:
     Client(const std::string &hname,
-           const std::string &uname,
+           const int &uname,
            const std::string &p)
         : hostname(hname), username(uname), port(p)
     {
@@ -56,7 +56,7 @@ protected:
 
 private:
     std::string hostname;
-    std::string username;
+    int username;
     std::string port;
     // You can have an instance of the client stub
     // as a member variable.
@@ -64,9 +64,9 @@ private:
 
     IReply Login();
     IReply List();
-    IReply Follow(const std::string &username2);
-    IReply UnFollow(const std::string &username2);
-    void Timeline(const std::string &username);
+    IReply Follow(const int &username2);
+    IReply UnFollow(const int &username2);
+    void Timeline(const int &username);
 };
 
 void printUsage(std::string arg = "")
@@ -125,9 +125,9 @@ int main(int argc, char **argv)
         }
     }
 
-    std::string username = "u" + std::to_string(c_id);
+    //std::string username = "u" + std::to_string(c_id);
 
-    Client myc(c_hostname, username, c_port);
+    Client myc(c_hostname, c_id, c_port);
     // You MUST invoke "run_client" function to start business logic
     myc.run_client();
 
@@ -163,7 +163,7 @@ IReply Client::processCommand(std::string &input)
         }
         */
 
-        std::string argument = input.substr(index + 1, (input.length() - index));
+        int argument = atoi(input.substr(index + 1, (input.length() - index)).c_str());
 
         if (cmd == "FOLLOW")
         {
@@ -218,19 +218,19 @@ IReply Client::List()
         ire.comm_status = SUCCESS;
         std::string all_users;
         std::string following_users;
-        for (std::string s : list_reply.all_users())
+        for (int s : list_reply.all_users())
         {
-            ire.all_users.push_back(s);
+            ire.all_users.push_back(std::to_string(s));
         }
-        for (std::string s : list_reply.followers())
+        for (int s : list_reply.followers())
         {
-            ire.followers.push_back(s);
+            ire.followers.push_back(std::to_string(s));
         }
     }
     return ire;
 }
 
-IReply Client::Follow(const std::string &username2)
+IReply Client::Follow(const int &username2)
 {
     Request request;
     request.set_username(username);
@@ -265,7 +265,7 @@ IReply Client::Follow(const std::string &username2)
     return ire;
 }
 
-IReply Client::UnFollow(const std::string &username2)
+IReply Client::UnFollow(const int &username2)
 {
     Request request;
 
@@ -321,7 +321,7 @@ IReply Client::Login()
     return ire;
 }
 
-void Client::Timeline(const std::string &username)
+void Client::Timeline(const int &username)
 {
     ClientContext context;
 
@@ -348,7 +348,7 @@ void Client::Timeline(const std::string &username)
 
             google::protobuf::Timestamp temptime = m.timestamp();
             std::time_t time = temptime.seconds();
-            displayPostMessage(m.username(), m.msg(), time);
+            displayPostMessage(std::to_string(m.username()), m.msg(), time);
             } });
 
     // Wait for the threads to finish

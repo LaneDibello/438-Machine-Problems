@@ -6,7 +6,6 @@ import "google/protobuf/timestamp.proto";
 
 // The messenger service definition.
 service SNSService{
-
   rpc Login (Request) returns (Reply) {}
   rpc List (Request) returns (ListReply) {}
   rpc Follow (Request) returns (Reply) {}
@@ -15,22 +14,41 @@ service SNSService{
   rpc Timeline (stream Message) returns (stream Message) {} 
 }
 
+// Master/Slave Interaction
+service SNSSandMInform{
+  rpc PokeMaster (ServerIdent) returns (ServerIdent) {} //Slave tells the master they exist
+  rpc LoginUpdate (Request) returns (Reply) {}
+  rpc FollowUpdate (FollowData) returns (Blep) {} //Master tells slave about follows
+  rpc TimelineUpdate (MsgChunk) returns (Blep) {} //Master tells slaves about messages
+}
+
 //The Coordination Service definition
 service SNSCoord{
-  rpc ClusterSpawn (ClusterInfo) returns (Reply) {} //Server sends this to coord
+  rpc ClusterSpawn (ClusterInfo) returns (ServerIdent) {} //Server sends this to coord
+  rpc FollowerSpawn (FollowerInfo) returns (Blep) {}
   rpc GetConnection (JoinReq) returns (ClusterInfo) {} //Client sends this to coord
+  rpc GetFollowing (JoinReq) returns (FollowerInfo) {} //Get's follower for id in JoinReq
   rpc Gucci (HrtBt) returns (HrtBt) {} //Are you stil there? (´･_･`)
 }
 
+service SNSFollower{
+  rpc Following (FollowPair) returns (Blep) {} //Follower tells their buddy about a new follow
+  rpc newClient (JoinReq) returns (Blep) {} //If a client pings the coord follower should know
+}
+
+//A generic thumbsup/placeholder message
+message Blep {
+  bool dope = 1;
+}
 
 message ListReply {
-  repeated string all_users = 1;
-  repeated string followers = 2;
+  repeated int32 all_users = 1;
+  repeated int32 followers = 2;
 }
 
 message Request {
-  string username = 1;
-  repeated string arguments = 2;
+  int32 username = 1;
+  repeated int32 arguments = 2;
 }
 
 message Reply {
@@ -39,11 +57,22 @@ message Reply {
 
 message Message {
   //Username who sent the message
-  string username = 1;
+  int32 username = 1;
   //Message from the user
   string msg = 2;
   //Time the message was sent
   google.protobuf.Timestamp timestamp = 3;
+}
+
+message FollowerInfo {
+  //The address of the machine running this follower
+  string addr = 1;
+  //The port of the machine running this follower
+  string port = 2;
+  //The the ID of this follower
+  int32 id = 3;
+  //The id of teh server it follows
+  int32 sid = 4;
 }
 
 message ClusterInfo {
@@ -64,4 +93,36 @@ message JoinReq {
 message HrtBt {
   int32 id = 1;
   bool master = 2;
+}
+
+//Identifying info so a server knows its master/slave status
+message ServerIdent {
+  //You are the master
+  bool master = 1;
+  //Your partner's port
+  string port = 2;
+  //Your partner's address (should be same)
+  string addr = 3;
+}
+
+//Data about who a certain client follows
+message FollowData {
+  //The client's ID
+  int32 id = 1;
+  //Who they're following
+  repeated int32 following = 2;
+  //Whose following them
+  repeated int32 followers = 3;
+}
+
+//The last 20 messages of a timeline
+message MsgChunk {
+  int32 id = 1;
+  repeated string msgs = 2;
+}
+
+message FollowPair {
+  //Client id follows fid
+  int32 id = 1;
+  int32 fid = 2; 
 }

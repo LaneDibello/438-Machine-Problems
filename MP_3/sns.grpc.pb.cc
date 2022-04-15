@@ -242,9 +242,198 @@ SNSService::Service::~Service() {
 }
 
 
+static const char* SNSSandMInform_method_names[] = {
+  "/csce438.SNSSandMInform/PokeMaster",
+  "/csce438.SNSSandMInform/LoginUpdate",
+  "/csce438.SNSSandMInform/FollowUpdate",
+  "/csce438.SNSSandMInform/TimelineUpdate",
+};
+
+std::unique_ptr< SNSSandMInform::Stub> SNSSandMInform::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
+  (void)options;
+  std::unique_ptr< SNSSandMInform::Stub> stub(new SNSSandMInform::Stub(channel, options));
+  return stub;
+}
+
+SNSSandMInform::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_PokeMaster_(SNSSandMInform_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_LoginUpdate_(SNSSandMInform_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_FollowUpdate_(SNSSandMInform_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_TimelineUpdate_(SNSSandMInform_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  {}
+
+::grpc::Status SNSSandMInform::Stub::PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::csce438::ServerIdent* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::ServerIdent, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_PokeMaster_, context, request, response);
+}
+
+void SNSSandMInform::Stub::async::PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::ServerIdent, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PokeMaster_, context, request, response, std::move(f));
+}
+
+void SNSSandMInform::Stub::async::PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PokeMaster_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* SNSSandMInform::Stub::PrepareAsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::ServerIdent, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_PokeMaster_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* SNSSandMInform::Stub::AsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncPokeMasterRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSSandMInform::Stub::LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_LoginUpdate_, context, request, response);
+}
+
+void SNSSandMInform::Stub::async::LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_LoginUpdate_, context, request, response, std::move(f));
+}
+
+void SNSSandMInform::Stub::async::LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_LoginUpdate_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSSandMInform::Stub::PrepareAsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Reply, ::csce438::Request, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_LoginUpdate_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSSandMInform::Stub::AsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncLoginUpdateRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSSandMInform::Stub::FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::FollowData, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_FollowUpdate_, context, request, response);
+}
+
+void SNSSandMInform::Stub::async::FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::FollowData, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_FollowUpdate_, context, request, response, std::move(f));
+}
+
+void SNSSandMInform::Stub::async::FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_FollowUpdate_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSSandMInform::Stub::PrepareAsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::FollowData, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_FollowUpdate_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSSandMInform::Stub::AsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncFollowUpdateRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSSandMInform::Stub::TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_TimelineUpdate_, context, request, response);
+}
+
+void SNSSandMInform::Stub::async::TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_TimelineUpdate_, context, request, response, std::move(f));
+}
+
+void SNSSandMInform::Stub::async::TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_TimelineUpdate_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSSandMInform::Stub::PrepareAsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::MsgChunk, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_TimelineUpdate_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSSandMInform::Stub::AsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncTimelineUpdateRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+SNSSandMInform::Service::Service() {
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSSandMInform_method_names[0],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSSandMInform::Service, ::csce438::ServerIdent, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSSandMInform::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::ServerIdent* req,
+             ::csce438::ServerIdent* resp) {
+               return service->PokeMaster(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSSandMInform_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSSandMInform::Service, ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSSandMInform::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::Request* req,
+             ::csce438::Reply* resp) {
+               return service->LoginUpdate(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSSandMInform_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSSandMInform::Service, ::csce438::FollowData, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSSandMInform::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::FollowData* req,
+             ::csce438::Blep* resp) {
+               return service->FollowUpdate(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSSandMInform_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSSandMInform::Service, ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSSandMInform::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::MsgChunk* req,
+             ::csce438::Blep* resp) {
+               return service->TimelineUpdate(ctx, req, resp);
+             }, this)));
+}
+
+SNSSandMInform::Service::~Service() {
+}
+
+::grpc::Status SNSSandMInform::Service::PokeMaster(::grpc::ServerContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSSandMInform::Service::LoginUpdate(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSSandMInform::Service::FollowUpdate(::grpc::ServerContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSSandMInform::Service::TimelineUpdate(::grpc::ServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+
 static const char* SNSCoord_method_names[] = {
   "/csce438.SNSCoord/ClusterSpawn",
+  "/csce438.SNSCoord/FollowerSpawn",
   "/csce438.SNSCoord/GetConnection",
+  "/csce438.SNSCoord/GetFollowing",
   "/csce438.SNSCoord/Gucci",
 };
 
@@ -256,29 +445,54 @@ std::unique_ptr< SNSCoord::Stub> SNSCoord::NewStub(const std::shared_ptr< ::grpc
 
 SNSCoord::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_ClusterSpawn_(SNSCoord_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetConnection_(SNSCoord_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Gucci_(SNSCoord_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_FollowerSpawn_(SNSCoord_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetConnection_(SNSCoord_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetFollowing_(SNSCoord_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Gucci_(SNSCoord_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status SNSCoord::Stub::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::csce438::Reply* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::csce438::ClusterInfo, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ClusterSpawn_, context, request, response);
+::grpc::Status SNSCoord::Stub::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::csce438::ServerIdent* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::ClusterInfo, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ClusterSpawn_, context, request, response);
 }
 
-void SNSCoord::Stub::async::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::csce438::ClusterInfo, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ClusterSpawn_, context, request, response, std::move(f));
+void SNSCoord::Stub::async::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::ClusterInfo, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ClusterSpawn_, context, request, response, std::move(f));
 }
 
-void SNSCoord::Stub::async::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) {
+void SNSCoord::Stub::async::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ClusterSpawn_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSCoord::Stub::PrepareAsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Reply, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ClusterSpawn_, context, request);
+::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* SNSCoord::Stub::PrepareAsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::ServerIdent, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ClusterSpawn_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSCoord::Stub::AsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* SNSCoord::Stub::AsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncClusterSpawnRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSCoord::Stub::FollowerSpawn(::grpc::ClientContext* context, const ::csce438::FollowerInfo& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::FollowerInfo, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_FollowerSpawn_, context, request, response);
+}
+
+void SNSCoord::Stub::async::FollowerSpawn(::grpc::ClientContext* context, const ::csce438::FollowerInfo* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::FollowerInfo, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_FollowerSpawn_, context, request, response, std::move(f));
+}
+
+void SNSCoord::Stub::async::FollowerSpawn(::grpc::ClientContext* context, const ::csce438::FollowerInfo* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_FollowerSpawn_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSCoord::Stub::PrepareAsyncFollowerSpawnRaw(::grpc::ClientContext* context, const ::csce438::FollowerInfo& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::FollowerInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_FollowerSpawn_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSCoord::Stub::AsyncFollowerSpawnRaw(::grpc::ClientContext* context, const ::csce438::FollowerInfo& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncFollowerSpawnRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -302,6 +516,29 @@ void SNSCoord::Stub::async::GetConnection(::grpc::ClientContext* context, const 
 ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* SNSCoord::Stub::AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncGetConnectionRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSCoord::Stub::GetFollowing(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::FollowerInfo* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::JoinReq, ::csce438::FollowerInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetFollowing_, context, request, response);
+}
+
+void SNSCoord::Stub::async::GetFollowing(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::JoinReq, ::csce438::FollowerInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetFollowing_, context, request, response, std::move(f));
+}
+
+void SNSCoord::Stub::async::GetFollowing(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetFollowing_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::FollowerInfo>* SNSCoord::Stub::PrepareAsyncGetFollowingRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::FollowerInfo, ::csce438::JoinReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetFollowing_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::FollowerInfo>* SNSCoord::Stub::AsyncGetFollowingRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncGetFollowingRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -333,15 +570,25 @@ SNSCoord::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSCoord_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::ClusterInfo, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::ClusterInfo, ::csce438::ServerIdent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](SNSCoord::Service* service,
              ::grpc::ServerContext* ctx,
              const ::csce438::ClusterInfo* req,
-             ::csce438::Reply* resp) {
+             ::csce438::ServerIdent* resp) {
                return service->ClusterSpawn(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSCoord_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::FollowerInfo, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSCoord::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::FollowerInfo* req,
+             ::csce438::Blep* resp) {
+               return service->FollowerSpawn(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSCoord_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::JoinReq, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](SNSCoord::Service* service,
@@ -351,7 +598,17 @@ SNSCoord::Service::Service() {
                return service->GetConnection(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      SNSCoord_method_names[2],
+      SNSCoord_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::JoinReq, ::csce438::FollowerInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSCoord::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::JoinReq* req,
+             ::csce438::FollowerInfo* resp) {
+               return service->GetFollowing(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSCoord_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::HrtBt, ::csce438::HrtBt, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](SNSCoord::Service* service,
@@ -365,7 +622,14 @@ SNSCoord::Service::Service() {
 SNSCoord::Service::~Service() {
 }
 
-::grpc::Status SNSCoord::Service::ClusterSpawn(::grpc::ServerContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response) {
+::grpc::Status SNSCoord::Service::ClusterSpawn(::grpc::ServerContext* context, const ::csce438::ClusterInfo* request, ::csce438::ServerIdent* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSCoord::Service::FollowerSpawn(::grpc::ServerContext* context, const ::csce438::FollowerInfo* request, ::csce438::Blep* response) {
   (void) context;
   (void) request;
   (void) response;
@@ -379,7 +643,117 @@ SNSCoord::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status SNSCoord::Service::GetFollowing(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 ::grpc::Status SNSCoord::Service::Gucci(::grpc::ServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+
+static const char* SNSFollower_method_names[] = {
+  "/csce438.SNSFollower/Following",
+  "/csce438.SNSFollower/newClient",
+};
+
+std::unique_ptr< SNSFollower::Stub> SNSFollower::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
+  (void)options;
+  std::unique_ptr< SNSFollower::Stub> stub(new SNSFollower::Stub(channel, options));
+  return stub;
+}
+
+SNSFollower::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_Following_(SNSFollower_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_newClient_(SNSFollower_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  {}
+
+::grpc::Status SNSFollower::Stub::Following(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::FollowPair, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Following_, context, request, response);
+}
+
+void SNSFollower::Stub::async::Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::FollowPair, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Following_, context, request, response, std::move(f));
+}
+
+void SNSFollower::Stub::async::Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Following_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::PrepareAsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::FollowPair, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Following_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::AsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncFollowingRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSFollower::Stub::newClient(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::JoinReq, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_newClient_, context, request, response);
+}
+
+void SNSFollower::Stub::async::newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::JoinReq, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_newClient_, context, request, response, std::move(f));
+}
+
+void SNSFollower::Stub::async::newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_newClient_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::PrepareAsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::JoinReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_newClient_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::AsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncnewClientRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+SNSFollower::Service::Service() {
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSFollower_method_names[0],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSFollower::Service, ::csce438::FollowPair, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSFollower::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::FollowPair* req,
+             ::csce438::Blep* resp) {
+               return service->Following(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSFollower_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSFollower::Service, ::csce438::JoinReq, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSFollower::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::JoinReq* req,
+             ::csce438::Blep* resp) {
+               return service->newClient(ctx, req, resp);
+             }, this)));
+}
+
+SNSFollower::Service::~Service() {
+}
+
+::grpc::Status SNSFollower::Service::Following(::grpc::ServerContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSFollower::Service::newClient(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response) {
   (void) context;
   (void) request;
   (void) response;
