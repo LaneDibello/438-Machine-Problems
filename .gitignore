@@ -1,2 +1,8 @@
 MP1/crc
 MP1/crsd
+client
+server
+synchronizer
+coordinator
+*.txt
+*.o

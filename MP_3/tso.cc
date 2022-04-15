@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <thread>
 #include <map>
 #include <string>
 #include <stdexcept>
@@ -55,7 +56,7 @@ struct clustinfo {
   std::string print() {
     return master_addr + ":" + master_port + " | " + slave_addr + ":" + slave_port;
   }
-}
+};
 
 //Maps server IDs to clusters
 std::map<int, struct clustinfo*> c_map;
@@ -64,15 +65,16 @@ class SNSCoordImpl final : public SNSCoord::Service {
   //server pings the coordinator with new cluster info
   Status ClusterSpawn(ServerContext* context, const ClusterInfo* request, Reply* response){
     int id = request->id(); //Grab the server ID (used as a key for c_map)
+    struct clustinfo* cif;
     try { //If the obj already exists, then this is the slave
-      struct clustinfo* cif = c_map.at(id);
+      cif = c_map.at(id);
       cif->slave_addr = request->addr();
       cif->slave_port = request->port();
       cif->slave_live = true;
     }
     catch (const std::out_of_range& oor) //Otherwise, make a new obj for the master
     {
-      struct clustinfo* cif = new clustinfo;
+      cif = new clustinfo;
       cif->master_addr = request->addr();
       cif->master_port = request->port();
       cif->master_live = true;
@@ -104,7 +106,7 @@ class SNSCoordImpl final : public SNSCoord::Service {
     {
       std::cerr << "FATAL error, non-existant server cluster for ID: " << serverID << std::endl;
       std::cerr << "map had:\n";
-      for (auto p : clusters){
+      for (auto p : c_map){
         std::cerr << p.first << " => " << p.second->print() << std::endl;
       }
       return Status::CANCELLED;
@@ -113,8 +115,8 @@ class SNSCoordImpl final : public SNSCoord::Service {
   }
 
   Status Gucci(ServerContext* context, const HrtBt* request, HrtBt* response){
-    int id = request.id();
-    bool isMaster = request.master();
+    int id = request->id();
+    bool isMaster = request->master();
     
     try {
       //Try to find the cluster in the hash map

@@ -856,20 +856,29 @@ class SNSCoord final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> PrepareAsyncClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(PrepareAsyncClusterSpawnRaw(context, request, cq));
     }
-    virtual ::grpc::Status GetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::ClusterInfo* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>> AsyncGetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+    virtual ::grpc::Status GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::ClusterInfo* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>> AsyncGetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>>(AsyncGetConnectionRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>> PrepareAsyncGetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>> PrepareAsyncGetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>>(PrepareAsyncGetConnectionRaw(context, request, cq));
+    }
+    virtual ::grpc::Status Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::csce438::HrtBt* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>> AsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>>(AsyncGucciRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>> PrepareAsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>>(PrepareAsyncGucciRaw(context, request, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
       virtual void ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -877,8 +886,10 @@ class SNSCoord final {
    private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* AsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* PrepareAsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>* AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>* PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>* AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ClusterInfo>* PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>* AsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>* PrepareAsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -890,20 +901,29 @@ class SNSCoord final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> PrepareAsyncClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(PrepareAsyncClusterSpawnRaw(context, request, cq));
     }
-    ::grpc::Status GetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::ClusterInfo* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>> AsyncGetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+    ::grpc::Status GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::ClusterInfo* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>> AsyncGetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>>(AsyncGetConnectionRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>> PrepareAsyncGetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>> PrepareAsyncGetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>>(PrepareAsyncGetConnectionRaw(context, request, cq));
+    }
+    ::grpc::Status Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::csce438::HrtBt* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>> AsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>>(AsyncGucciRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>> PrepareAsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>>(PrepareAsyncGucciRaw(context, request, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
       void ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
       void ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)>) override;
-      void GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)>) override;
+      void GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, std::function<void(::grpc::Status)>) override;
+      void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -917,10 +937,13 @@ class SNSCoord final {
     class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* AsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* PrepareAsyncClusterSpawnRaw(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* AsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* PrepareAsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_ClusterSpawn_;
     const ::grpc::internal::RpcMethod rpcmethod_GetConnection_;
+    const ::grpc::internal::RpcMethod rpcmethod_Gucci_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -929,7 +952,8 @@ class SNSCoord final {
     Service();
     virtual ~Service();
     virtual ::grpc::Status ClusterSpawn(::grpc::ServerContext* context, const ::csce438::ClusterInfo* request, ::csce438::Reply* response);
-    virtual ::grpc::Status GetConnection(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response);
+    virtual ::grpc::Status GetConnection(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response);
+    virtual ::grpc::Status Gucci(::grpc::ServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_ClusterSpawn : public BaseClass {
@@ -963,15 +987,35 @@ class SNSCoord final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestGetConnection(::grpc::ServerContext* context, ::csce438::Request* request, ::grpc::ServerAsyncResponseWriter< ::csce438::ClusterInfo>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestGetConnection(::grpc::ServerContext* context, ::csce438::JoinReq* request, ::grpc::ServerAsyncResponseWriter< ::csce438::ClusterInfo>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_ClusterSpawn<WithAsyncMethod_GetConnection<Service > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_Gucci() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGucci(::grpc::ServerContext* context, ::csce438::HrtBt* request, ::grpc::ServerAsyncResponseWriter< ::csce438::HrtBt>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_ClusterSpawn<WithAsyncMethod_GetConnection<WithAsyncMethod_Gucci<Service > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_ClusterSpawn : public BaseClass {
    private:
@@ -1006,27 +1050,54 @@ class SNSCoord final {
    public:
     WithCallbackMethod_GetConnection() {
       ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::ClusterInfo>(
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::JoinReq, ::csce438::ClusterInfo>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response) { return this->GetConnection(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response) { return this->GetConnection(context, request, response); }));}
     void SetMessageAllocatorFor_GetConnection(
-        ::grpc::MessageAllocator< ::csce438::Request, ::csce438::ClusterInfo>* allocator) {
+        ::grpc::MessageAllocator< ::csce438::JoinReq, ::csce438::ClusterInfo>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::ClusterInfo>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::JoinReq, ::csce438::ClusterInfo>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_GetConnection() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* GetConnection(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_ClusterSpawn<WithCallbackMethod_GetConnection<Service > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Gucci() {
+      ::grpc::Service::MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::HrtBt, ::csce438::HrtBt>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response) { return this->Gucci(context, request, response); }));}
+    void SetMessageAllocatorFor_Gucci(
+        ::grpc::MessageAllocator< ::csce438::HrtBt, ::csce438::HrtBt>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::HrtBt, ::csce438::HrtBt>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Gucci(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_ClusterSpawn<WithCallbackMethod_GetConnection<WithCallbackMethod_Gucci<Service > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_ClusterSpawn : public BaseClass {
@@ -1057,7 +1128,24 @@ class SNSCoord final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_Gucci() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1094,12 +1182,32 @@ class SNSCoord final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetConnection(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_Gucci() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGucci(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1139,11 +1247,33 @@ class SNSCoord final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* GetConnection(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Gucci() {
+      ::grpc::Service::MarkMethodRawCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Gucci(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Gucci(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -1181,10 +1311,10 @@ class SNSCoord final {
     WithStreamedUnaryMethod_GetConnection() {
       ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::csce438::Request, ::csce438::ClusterInfo>(
+          ::csce438::JoinReq, ::csce438::ClusterInfo>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::csce438::Request, ::csce438::ClusterInfo>* streamer) {
+                     ::csce438::JoinReq, ::csce438::ClusterInfo>* streamer) {
                        return this->StreamedGetConnection(context,
                          streamer);
                   }));
@@ -1193,16 +1323,43 @@ class SNSCoord final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
+    ::grpc::Status GetConnection(::grpc::ServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::ClusterInfo* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedGetConnection(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::Request,::csce438::ClusterInfo>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedGetConnection(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::JoinReq,::csce438::ClusterInfo>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_GetConnection<Service > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_Gucci : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_Gucci() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::csce438::HrtBt, ::csce438::HrtBt>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::csce438::HrtBt, ::csce438::HrtBt>* streamer) {
+                       return this->StreamedGucci(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_Gucci() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGucci(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::HrtBt,::csce438::HrtBt>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_Gucci<Service > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_GetConnection<Service > > StreamedService;
+  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_Gucci<Service > > > StreamedService;
 };
 
 }  // namespace csce438

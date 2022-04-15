@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export MY_INSTALL_DIR=$HOME/.grpc
+

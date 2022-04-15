@@ -68,7 +68,7 @@ class Client : public IClient
 };
 
 void printUsage(std::string arg = ""){
-  if (arg != "") {std::cerr << "Bad argument: " << arg << endl;}
+  if (arg != "") {std::cerr << "Bad argument: " << arg << std::endl;}
   std::cerr << "Usage:" << std::endl;
   std::cerr << "$./client -cip <coordinatorIP> -cp <coordinatorPort> -id <clientId>" << std::endl;
 
@@ -100,8 +100,8 @@ int main(int argc, char** argv) {
         if (c_port.size() > 6) printUsage(arg);
       }
       else if (arg == "-id"){
-        f_id = atoi(argv[i+1]);
-        if (f_id < 0) {
+        c_id = atoi(argv[i+1]);
+        if (c_id < 0) {
           printUsage(arg);
         }
       }
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     
     std::string username = "u" + std::to_string(c_id);
 
-    Client myc(c_hostname, username, port);
+    Client myc(c_hostname, username, c_port);
     // You MUST invoke "run_client" function to start business logic
     myc.run_client();
 

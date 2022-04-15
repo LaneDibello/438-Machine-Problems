@@ -47,7 +47,7 @@ struct TableStruct_sns_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,6 +58,12 @@ namespace csce438 {
 class ClusterInfo;
 struct ClusterInfoDefaultTypeInternal;
 extern ClusterInfoDefaultTypeInternal _ClusterInfo_default_instance_;
+class HrtBt;
+struct HrtBtDefaultTypeInternal;
+extern HrtBtDefaultTypeInternal _HrtBt_default_instance_;
+class JoinReq;
+struct JoinReqDefaultTypeInternal;
+extern JoinReqDefaultTypeInternal _JoinReq_default_instance_;
 class ListReply;
 struct ListReplyDefaultTypeInternal;
 extern ListReplyDefaultTypeInternal _ListReply_default_instance_;
@@ -73,6 +79,8 @@ extern RequestDefaultTypeInternal _Request_default_instance_;
 }  // namespace csce438
 PROTOBUF_NAMESPACE_OPEN
 template<> ::csce438::ClusterInfo* Arena::CreateMaybeMessage<::csce438::ClusterInfo>(Arena*);
+template<> ::csce438::HrtBt* Arena::CreateMaybeMessage<::csce438::HrtBt>(Arena*);
+template<> ::csce438::JoinReq* Arena::CreateMaybeMessage<::csce438::JoinReq>(Arena*);
 template<> ::csce438::ListReply* Arena::CreateMaybeMessage<::csce438::ListReply>(Arena*);
 template<> ::csce438::Message* Arena::CreateMaybeMessage<::csce438::Message>(Arena*);
 template<> ::csce438::Reply* Arena::CreateMaybeMessage<::csce438::Reply>(Arena*);
@@ -893,6 +901,7 @@ class ClusterInfo final :
   enum : int {
     kAddrFieldNumber = 1,
     kPortFieldNumber = 2,
+    kIdFieldNumber = 3,
   };
   // string addr = 1;
   void clear_addr();
@@ -922,6 +931,15 @@ class ClusterInfo final :
   std::string* _internal_mutable_port();
   public:
 
+  // int32 id = 3;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int32 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:csce438.ClusterInfo)
  private:
   class _Internal;
@@ -931,6 +949,304 @@ class ClusterInfo final :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr addr_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr port_;
+  ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sns_2eproto;
+};
+// -------------------------------------------------------------------
+
+class JoinReq final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:csce438.JoinReq) */ {
+ public:
+  inline JoinReq() : JoinReq(nullptr) {}
+  ~JoinReq() override;
+  explicit constexpr JoinReq(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  JoinReq(const JoinReq& from);
+  JoinReq(JoinReq&& from) noexcept
+    : JoinReq() {
+    *this = ::std::move(from);
+  }
+
+  inline JoinReq& operator=(const JoinReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline JoinReq& operator=(JoinReq&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const JoinReq& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const JoinReq* internal_default_instance() {
+    return reinterpret_cast<const JoinReq*>(
+               &_JoinReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(JoinReq& a, JoinReq& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(JoinReq* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(JoinReq* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline JoinReq* New() const final {
+    return new JoinReq();
+  }
+
+  JoinReq* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<JoinReq>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const JoinReq& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const JoinReq& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(JoinReq* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "csce438.JoinReq";
+  }
+  protected:
+  explicit JoinReq(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kIdFieldNumber = 1,
+  };
+  // int32 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int32 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:csce438.JoinReq)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sns_2eproto;
+};
+// -------------------------------------------------------------------
+
+class HrtBt final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:csce438.HrtBt) */ {
+ public:
+  inline HrtBt() : HrtBt(nullptr) {}
+  ~HrtBt() override;
+  explicit constexpr HrtBt(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  HrtBt(const HrtBt& from);
+  HrtBt(HrtBt&& from) noexcept
+    : HrtBt() {
+    *this = ::std::move(from);
+  }
+
+  inline HrtBt& operator=(const HrtBt& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline HrtBt& operator=(HrtBt&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const HrtBt& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const HrtBt* internal_default_instance() {
+    return reinterpret_cast<const HrtBt*>(
+               &_HrtBt_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(HrtBt& a, HrtBt& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(HrtBt* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(HrtBt* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline HrtBt* New() const final {
+    return new HrtBt();
+  }
+
+  HrtBt* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<HrtBt>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const HrtBt& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const HrtBt& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(HrtBt* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "csce438.HrtBt";
+  }
+  protected:
+  explicit HrtBt(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kIdFieldNumber = 1,
+    kMasterFieldNumber = 2,
+  };
+  // int32 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int32 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // bool master = 2;
+  void clear_master();
+  bool master() const;
+  void set_master(bool value);
+  private:
+  bool _internal_master() const;
+  void _internal_set_master(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:csce438.HrtBt)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  bool master_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sns_2eproto;
 };
@@ -1548,9 +1864,101 @@ inline void ClusterInfo::set_allocated_port(std::string* port) {
   // @@protoc_insertion_point(field_set_allocated:csce438.ClusterInfo.port)
 }
 
+// int32 id = 3;
+inline void ClusterInfo::clear_id() {
+  id_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ClusterInfo::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ClusterInfo::id() const {
+  // @@protoc_insertion_point(field_get:csce438.ClusterInfo.id)
+  return _internal_id();
+}
+inline void ClusterInfo::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  id_ = value;
+}
+inline void ClusterInfo::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:csce438.ClusterInfo.id)
+}
+
+// -------------------------------------------------------------------
+
+// JoinReq
+
+// int32 id = 1;
+inline void JoinReq::clear_id() {
+  id_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 JoinReq::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 JoinReq::id() const {
+  // @@protoc_insertion_point(field_get:csce438.JoinReq.id)
+  return _internal_id();
+}
+inline void JoinReq::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  id_ = value;
+}
+inline void JoinReq::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:csce438.JoinReq.id)
+}
+
+// -------------------------------------------------------------------
+
+// HrtBt
+
+// int32 id = 1;
+inline void HrtBt::clear_id() {
+  id_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 HrtBt::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 HrtBt::id() const {
+  // @@protoc_insertion_point(field_get:csce438.HrtBt.id)
+  return _internal_id();
+}
+inline void HrtBt::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  id_ = value;
+}
+inline void HrtBt::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:csce438.HrtBt.id)
+}
+
+// bool master = 2;
+inline void HrtBt::clear_master() {
+  master_ = false;
+}
+inline bool HrtBt::_internal_master() const {
+  return master_;
+}
+inline bool HrtBt::master() const {
+  // @@protoc_insertion_point(field_get:csce438.HrtBt.master)
+  return _internal_master();
+}
+inline void HrtBt::_internal_set_master(bool value) {
+  
+  master_ = value;
+}
+inline void HrtBt::set_master(bool value) {
+  _internal_set_master(value);
+  // @@protoc_insertion_point(field_set:csce438.HrtBt.master)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

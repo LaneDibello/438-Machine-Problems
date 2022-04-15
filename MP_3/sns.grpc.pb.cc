@@ -245,6 +245,7 @@ SNSService::Service::~Service() {
 static const char* SNSCoord_method_names[] = {
   "/csce438.SNSCoord/ClusterSpawn",
   "/csce438.SNSCoord/GetConnection",
+  "/csce438.SNSCoord/Gucci",
 };
 
 std::unique_ptr< SNSCoord::Stub> SNSCoord::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -256,6 +257,7 @@ std::unique_ptr< SNSCoord::Stub> SNSCoord::NewStub(const std::shared_ptr< ::grpc
 SNSCoord::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_ClusterSpawn_(SNSCoord_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetConnection_(SNSCoord_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Gucci_(SNSCoord_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status SNSCoord::Stub::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::csce438::Reply* response) {
@@ -281,25 +283,48 @@ void SNSCoord::Stub::async::ClusterSpawn(::grpc::ClientContext* context, const :
   return result;
 }
 
-::grpc::Status SNSCoord::Stub::GetConnection(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::ClusterInfo* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::csce438::Request, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetConnection_, context, request, response);
+::grpc::Status SNSCoord::Stub::GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::ClusterInfo* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::JoinReq, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetConnection_, context, request, response);
 }
 
-void SNSCoord::Stub::async::GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::csce438::Request, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetConnection_, context, request, response, std::move(f));
+void SNSCoord::Stub::async::GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::JoinReq, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetConnection_, context, request, response, std::move(f));
 }
 
-void SNSCoord::Stub::async::GetConnection(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) {
+void SNSCoord::Stub::async::GetConnection(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetConnection_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* SNSCoord::Stub::PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::ClusterInfo, ::csce438::Request, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetConnection_, context, request);
+::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* SNSCoord::Stub::PrepareAsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::ClusterInfo, ::csce438::JoinReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetConnection_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* SNSCoord::Stub::AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::csce438::ClusterInfo>* SNSCoord::Stub::AsyncGetConnectionRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncGetConnectionRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSCoord::Stub::Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::csce438::HrtBt* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::HrtBt, ::csce438::HrtBt, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Gucci_, context, request, response);
+}
+
+void SNSCoord::Stub::async::Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::HrtBt, ::csce438::HrtBt, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Gucci_, context, request, response, std::move(f));
+}
+
+void SNSCoord::Stub::async::Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Gucci_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* SNSCoord::Stub::PrepareAsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::HrtBt, ::csce438::HrtBt, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Gucci_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* SNSCoord::Stub::AsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncGucciRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -318,12 +343,22 @@ SNSCoord::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSCoord_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::Request, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::JoinReq, ::csce438::ClusterInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](SNSCoord::Service* service,
              ::grpc::ServerContext* ctx,
-             const ::csce438::Request* req,
+             const ::csce438::JoinReq* req,
              ::csce438::ClusterInfo* resp) {
                return service->GetConnection(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSCoord_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::HrtBt, ::csce438::HrtBt, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSCoord::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::HrtBt* req,
+             ::csce438::HrtBt* resp) {
+               return service->Gucci(ctx, req, resp);
              }, this)));
 }
 
@@ -337,7 +372,14 @@ SNSCoord::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status SNSCoord::Service::GetConnection(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::ClusterInfo* response) {
+::grpc::Status SNSCoord::Service::GetConnection(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSCoord::Service::Gucci(::grpc::ServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response) {
   (void) context;
   (void) request;
   (void) response;

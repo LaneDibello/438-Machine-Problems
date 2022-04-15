@@ -28,11 +28,7 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
-using csce438::Message;
-using csce438::ListReply;
-using csce438::Request;
-using csce438::Reply;
-using csce438::SNSService;
+using namespace csce438;
 
 struct Client {
   std::string username;
@@ -231,7 +227,7 @@ void RunServer(std::string port_no) {
 }
 
 void printUsage(std::string arg = ""){
-  if (arg != "") {std::cerr << "Bad argument: " << arg << endl;}
+  if (arg != "") {std::cerr << "Bad argument: " << arg << std::endl;}
   std::cerr << "Usage:" << std::endl;
   std::cerr << "$./server -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <idNum> -t <master/slave>" << std::endl;
 

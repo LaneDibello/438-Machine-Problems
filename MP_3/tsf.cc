@@ -37,7 +37,7 @@ std::string c_port;
 int f_id;
 
 void printUsage(std::string arg = ""){
-  if (arg != "") {std::cerr << "Bad argument: " << arg << endl;}
+  if (arg != "") {std::cerr << "Bad argument: " << arg << std::endl;}
   std::cerr << "Usage:" << std::endl;
   std::cerr << "$./synchronizer -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <synchronizerId>" << std::endl;
 

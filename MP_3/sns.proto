@@ -19,7 +19,7 @@ service SNSService{
 service SNSCoord{
   rpc ClusterSpawn (ClusterInfo) returns (Reply) {} //Server sends this to coord
   rpc GetConnection (JoinReq) returns (ClusterInfo) {} //Client sends this to coord
-  rpc Gucci (HrtBt) return (HrtBt) {} //Are you stil there? (´･_･`)
+  rpc Gucci (HrtBt) returns (HrtBt) {} //Are you stil there? (´･_･`)
 }
 
 
