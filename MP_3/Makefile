@@ -31,7 +31,7 @@ tsf: sns.pb.o sns.grpc.pb.o tsf.o
 	$(CXX) $^ $(LDFLAGS) -g -o synchronizer
 
 #Coordinator recipe
-tso: sns.pb.o sns.grpc.pb.o tsf.o
+tso: sns.pb.o sns.grpc.pb.o tso.o
 	$(CXX) $^ $(LDFLAGS) -g -o coordinator
 
 .PRECIOUS: %.grpc.pb.cc
