@@ -357,37 +357,37 @@ const char descriptor_table_protodef_sns_2eproto[] PROTOBUF_SECTION_VARIABLE(pro
   "dr\030\003 \001(\t\">\n\nFollowData\022\n\n\002id\030\001 \001(\005\022\021\n\tfo"
   "llowing\030\002 \003(\005\022\021\n\tfollowers\030\003 \003(\005\"$\n\010MsgC"
   "hunk\022\n\n\002id\030\001 \001(\005\022\014\n\004msgs\030\002 \003(\t\"%\n\nFollow"
-  "Pair\022\n\n\002id\030\001 \001(\005\022\013\n\003fid\030\002 \001(\0052\375\001\n\nSNSSer"
+  "Pair\022\n\n\002id\030\001 \001(\005\022\013\n\003fid\030\002 \001(\0052\315\001\n\nSNSSer"
   "vice\022+\n\005Login\022\020.csce438.Request\032\016.csce43"
   "8.Reply\"\000\022.\n\004List\022\020.csce438.Request\032\022.cs"
   "ce438.ListReply\"\000\022,\n\006Follow\022\020.csce438.Re"
-  "quest\032\016.csce438.Reply\"\000\022.\n\010UnFollow\022\020.cs"
-  "ce438.Request\032\016.csce438.Reply\"\000\0224\n\010Timel"
-  "ine\022\020.csce438.Message\032\020.csce438.Message\""
-  "\000(\0010\0012\353\001\n\016SNSSandMInform\022:\n\nPokeMaster\022\024"
-  ".csce438.ServerIdent\032\024.csce438.ServerIde"
-  "nt\"\000\0221\n\013LoginUpdate\022\020.csce438.Request\032\016."
-  "csce438.Reply\"\000\0224\n\014FollowUpdate\022\023.csce43"
-  "8.FollowData\032\r.csce438.Blep\"\000\0224\n\016Timelin"
-  "eUpdate\022\021.csce438.MsgChunk\032\r.csce438.Ble"
-  "p\"\0002\242\002\n\010SNSCoord\022<\n\014ClusterSpawn\022\024.csce4"
-  "38.ClusterInfo\032\024.csce438.ServerIdent\"\000\0227"
-  "\n\rFollowerSpawn\022\025.csce438.FollowerInfo\032\r"
-  ".csce438.Blep\"\000\0229\n\rGetConnection\022\020.csce4"
-  "38.JoinReq\032\024.csce438.ClusterInfo\"\000\0229\n\014Ge"
-  "tFollowing\022\020.csce438.JoinReq\032\025.csce438.F"
-  "ollowerInfo\"\000\022)\n\005Gucci\022\016.csce438.HrtBt\032\016"
-  ".csce438.HrtBt\"\0002p\n\013SNSFollower\0221\n\tFollo"
-  "wing\022\023.csce438.FollowPair\032\r.csce438.Blep"
-  "\"\000\022.\n\tnewClient\022\020.csce438.JoinReq\032\r.csce"
-  "438.Blep\"\000b\006proto3"
+  "quest\032\016.csce438.Reply\"\000\0224\n\010Timeline\022\020.cs"
+  "ce438.Message\032\020.csce438.Message\"\000(\0010\0012\353\001"
+  "\n\016SNSSandMInform\022:\n\nPokeMaster\022\024.csce438"
+  ".ServerIdent\032\024.csce438.ServerIdent\"\000\0221\n\013"
+  "LoginUpdate\022\020.csce438.Request\032\016.csce438."
+  "Reply\"\000\0224\n\014FollowUpdate\022\023.csce438.Follow"
+  "Data\032\r.csce438.Blep\"\000\0224\n\016TimelineUpdate\022"
+  "\021.csce438.MsgChunk\032\r.csce438.Blep\"\0002\242\002\n\010"
+  "SNSCoord\022<\n\014ClusterSpawn\022\024.csce438.Clust"
+  "erInfo\032\024.csce438.ServerIdent\"\000\0227\n\rFollow"
+  "erSpawn\022\025.csce438.FollowerInfo\032\r.csce438"
+  ".Blep\"\000\0229\n\rGetConnection\022\020.csce438.JoinR"
+  "eq\032\024.csce438.ClusterInfo\"\000\0229\n\014GetFollowi"
+  "ng\022\020.csce438.JoinReq\032\025.csce438.FollowerI"
+  "nfo\"\000\022)\n\005Gucci\022\016.csce438.HrtBt\032\016.csce438"
+  ".HrtBt\"\0002\242\001\n\013SNSFollower\0221\n\tFollowing\022\023."
+  "csce438.FollowPair\032\r.csce438.Blep\"\000\0220\n\nn"
+  "ewMessage\022\021.csce438.MsgChunk\032\r.csce438.B"
+  "lep\"\000\022.\n\tnewClient\022\020.csce438.JoinReq\032\r.c"
+  "sce438.Blep\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_sns_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sns_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto = {
-  false, false, 1578, descriptor_table_protodef_sns_2eproto, "sns.proto", 
+  false, false, 1581, descriptor_table_protodef_sns_2eproto, "sns.proto", 
   &descriptor_table_sns_2eproto_once, descriptor_table_sns_2eproto_deps, 1, 13,
   schemas, file_default_instances, TableStruct_sns_2eproto::offsets,
   file_level_metadata_sns_2eproto, file_level_enum_descriptors_sns_2eproto, file_level_service_descriptors_sns_2eproto,

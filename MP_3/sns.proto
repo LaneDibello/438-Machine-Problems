@@ -31,6 +31,7 @@ service SNSCoord{
 
 service SNSFollower{
   rpc Following (FollowPair) returns (Blep) {} //Follower tells their buddy about a new follow
+  rpc newMessage (MsgChunk) returns (Blep) {}
   rpc newClient (JoinReq) returns (Blep) {} //If a client pings the coord follower should know
 }
 

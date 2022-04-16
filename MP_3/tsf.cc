@@ -4,11 +4,15 @@
 #include <google/protobuf/duration.pb.h>
 
 #include <fstream>
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <thread>
 #include <chrono>
+#include <iterator>
 #include <string>
+#include <stack>
 #include <set>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,6 +47,9 @@ int f_id;
 int s_id;
 std::set<int> client_ids;
 
+//Stub
+std::unique_ptr<csce438::SNSCoord::Stub> c_stub;
+
 class SNSFollowerImpl final : public SNSFollower::Service{
     Status Following(ServerContext *context, const FollowPair* request, Blep* response) override {
         int id = request->id();
@@ -60,13 +67,35 @@ class SNSFollowerImpl final : public SNSFollower::Service{
         return Status::OK;
     }
     Status newClient(ServerContext *context, const JoinReq* request, Blep* response) override {
-        client_ids.insert(request->id());
+        int id = request->id();
+        client_ids.insert(id);
+        std::thread t1(checkFollowUpdates, id);
+        std::thread t2(checkTimelineUpdates, id);
+        t1.detach();
+        t2.detach();
         return Status::OK;
+    }
+    Status newMessage(ServerContext *context, const MsgChunk* request, Blep* response) override {
+        int recv_id = request->id();
+        //distribute the new messages to the follower
+        std::ofstream ofs(std::to_string(recv_id) + "fTimlines.txt", std::ios::app | std::ios::out | std::ios::in);
+        for (auto msg : request->msgs()){
+            ofs << msg << std::endl;
+        }
+        ofs.close();
     }
 };
 
-//Check if uid follows anyone and then tell fid about it
-void checkFollowUpdates(int uid, int fid) {
+//Check if uid follows anyone and then tell their follower about it
+void checkFollowUpdates(int uid) {
+    std::set<int> following;
+    std::ifstream ifs(std::to_string(uid)+"follows.txt");
+    std::string u = "";
+    while(ifs.good()){
+        std::getline(ifs, u, ',');
+        following.insert(atoi(u.c_str()));
+    }
+    
     std::filesystem::path p = std::to_string(uid)+"follows.txt";
     int64_t last_write, now;
     for(;;){
@@ -75,14 +104,126 @@ void checkFollowUpdates(int uid, int fid) {
         now = std::chrono::system_clock::now().time_since_epoch().count();
         if (now - last_write < 30000000000){ //if there's been less than 30 seconds since last edit
             //Figure out new follower(s)
-            //if we're fid update followedBy.txt
-            //otherwise RPC the update to fid
+            std::set<int> fol;
+            std::ifstream ifs(std::to_string(uid)+"follows.txt");
+            u = "";
+            while(ifs.good()){
+                std::getline(ifs, u, ',');
+                fol.insert(atoi(u.c_str()));
+            }
+            std::set<int> diff;
+            std::set_difference (following.begin(), following.end(), fol.begin(), fol.end(), std::inserter(diff, diff.end()));
+            
+            //Update the following set
+            following.clear();
+            std::copy(fol.begin(), fol.end(), std::inserter(following, following.end()));
+
+            //Get the followedBy.txt update for each new followed
+            for (int i : diff){
+                if (client_ids.count(i)){ //If it's one of our update and move on
+                    std::ofstream fol_s (std::to_string(i) + "followedBy.txt", std::ios::app | std::ios::out | std::ios::in);
+                    fol_s << std::to_string(uid) << ",";
+                    fol_s.close();
+                }
+                else {
+                    //RPC coord to figure out who owns this boy
+                    JoinReq jr;
+                    FollowerInfo ci;
+                    ClientContext context;
+
+                    jr.set_id(i);
+
+                    Status status = c_stub->GetFollowing(&context, jr, &ci);
+                    if (!status.ok()) continue;
+
+                    //RPC the follower to send the update
+                    std::string f_login_info = ci.addr() + ":" + ci.port();
+                    auto f_stub = std::unique_ptr<SNSFollower::Stub>(SNSFollower::NewStub(grpc::CreateChannel(f_login_info, grpc::InsecureChannelCredentials())));
+
+                    FollowPair fp;
+                    Blep b;
+
+                    fp.set_id(uid); //uid follows i
+                    fp.set_fid(i);
+
+                    status = f_stub->Following(&context, fp, &b);
+                }
+            }
         }
     }
 }
 
+//Check if uid updates their timeline, and notify the others
 void checkTimelineUpdates(int uid){
     //implement me!!!!
+    std::filesystem::path p = std::to_string(uid)+"timeline.txt";
+    int64_t last_write, now;
+    for(;;){
+        sleep(30);
+        last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
+        now = std::chrono::system_clock::now().time_since_epoch().count();
+        if (now - last_write < 30000000000){
+            //Grab the posts
+            std::ifstream ifs(std::to_string(uid)+"timeline.txt");
+            std::stack<std::string> posts;
+            std::string p = "";
+            while(ifs.good()){
+                std::getline(ifs, p);
+                if(p == "") continue;
+                posts.push(p);
+            }
+            ifs.close();
+
+            //Build the MsgChunk
+            MsgChunk mc;
+            //mc.set_id(uid);
+            for (;;){ //we want most recent messages
+                //Time comparsion
+                std::string timestamp = posts.top().substr(0, 20);
+                char nowbuf[100];
+                time_t now = time(0);
+                struct tm *nowtm;
+                nowtm = localtime(&now);
+                nowtm->tm_sec -= 30;
+                mktime(nowtm);
+                strftime(nowbuf, sizeof(nowbuf), "%Y-%m-%dT%H:%M:%SZ", nowtm);
+                if (strncmp(timestamp.c_str(), nowbuf, timestamp.length()) >= 0){
+                    mc.add_msgs(posts.top());
+                }
+                posts.pop();
+            }
+
+            //Collect Followers
+            std::ifstream ifs1(std::to_string(uid)+"followedBy.txt");
+            std::vector<int> followers;
+            std::string u = "";
+            while(ifs.good()){
+                std::getline(ifs1, u, ',');
+                followers.push_back(atoi(u.c_str()));
+            }
+            ifs1.close();
+
+            //Broadcast our messages
+            ClientContext context;
+            for (int f : followers){
+                //Who does this belong to?
+                JoinReq jr;
+                FollowerInfo fi;
+                jr.set_id(f);
+                Status s = c_stub->GetFollowing(&context, jr, &fi);
+                if (!s.ok()) continue;
+
+                //RPC the follower to send the update
+                std::string f_login_info = fi.addr() + ":" + fi.port();
+                auto f_stub = std::unique_ptr<SNSFollower::Stub>(SNSFollower::NewStub(grpc::CreateChannel(f_login_info, grpc::InsecureChannelCredentials())));
+
+                mc.set_id(f);
+                Blep b;
+
+                f_stub->newMessage(&context, mc, &b);
+            }
+        }
+    }
 }
 
 void printUsage(std::string arg = "")
@@ -100,6 +241,10 @@ void printUsage(std::string arg = "")
 void RunServer(std::string port_no){
     std::string server_address = "0.0.0.0:" + port_no;
     SNSFollowerImpl service;
+
+    //Coordinator Stub
+    std::string c_login_info = c_hostname + ":" + c_port;
+    c_stub = std::unique_ptr<SNSCoord::Stub>(SNSCoord::NewStub(grpc::CreateChannel(c_login_info, grpc::InsecureChannelCredentials())));
 
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

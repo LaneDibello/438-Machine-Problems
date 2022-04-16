@@ -57,14 +57,6 @@ class SNSService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> PrepareAsyncFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(PrepareAsyncFollowRaw(context, request, cq));
     }
-    virtual ::grpc::Status UnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> AsyncUnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(AsyncUnFollowRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> PrepareAsyncUnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(PrepareAsyncUnFollowRaw(context, request, cq));
-    }
-    // Bidirectional streaming RPC
     std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::csce438::Message, ::csce438::Message>> Timeline(::grpc::ClientContext* context) {
       return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::csce438::Message, ::csce438::Message>>(TimelineRaw(context));
     }
@@ -83,9 +75,6 @@ class SNSService final {
       virtual void List(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ListReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      // Bidirectional streaming RPC
       virtual void Timeline(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::csce438::Message,::csce438::Message>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
@@ -98,8 +87,6 @@ class SNSService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ListReply>* PrepareAsyncListRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* AsyncFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* PrepareAsyncFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* AsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* PrepareAsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientReaderWriterInterface< ::csce438::Message, ::csce438::Message>* TimelineRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>* AsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>* PrepareAsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
@@ -128,13 +115,6 @@ class SNSService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> PrepareAsyncFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(PrepareAsyncFollowRaw(context, request, cq));
     }
-    ::grpc::Status UnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> AsyncUnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(AsyncUnFollowRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> PrepareAsyncUnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(PrepareAsyncUnFollowRaw(context, request, cq));
-    }
     std::unique_ptr< ::grpc::ClientReaderWriter< ::csce438::Message, ::csce438::Message>> Timeline(::grpc::ClientContext* context) {
       return std::unique_ptr< ::grpc::ClientReaderWriter< ::csce438::Message, ::csce438::Message>>(TimelineRaw(context));
     }
@@ -153,8 +133,6 @@ class SNSService final {
       void List(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::ListReply* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
       void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
-      void UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Timeline(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::csce438::Message,::csce438::Message>* reactor) override;
      private:
       friend class Stub;
@@ -173,15 +151,12 @@ class SNSService final {
     ::grpc::ClientAsyncResponseReader< ::csce438::ListReply>* PrepareAsyncListRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* AsyncFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* PrepareAsyncFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* AsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* PrepareAsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientReaderWriter< ::csce438::Message, ::csce438::Message>* TimelineRaw(::grpc::ClientContext* context) override;
     ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>* AsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>* PrepareAsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Login_;
     const ::grpc::internal::RpcMethod rpcmethod_List_;
     const ::grpc::internal::RpcMethod rpcmethod_Follow_;
-    const ::grpc::internal::RpcMethod rpcmethod_UnFollow_;
     const ::grpc::internal::RpcMethod rpcmethod_Timeline_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
@@ -193,8 +168,6 @@ class SNSService final {
     virtual ::grpc::Status Login(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
     virtual ::grpc::Status List(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::ListReply* response);
     virtual ::grpc::Status Follow(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
-    virtual ::grpc::Status UnFollow(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
-    // Bidirectional streaming RPC
     virtual ::grpc::Status Timeline(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::csce438::Message, ::csce438::Message>* stream);
   };
   template <class BaseClass>
@@ -258,32 +231,12 @@ class SNSService final {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_UnFollow() {
-      ::grpc::Service::MarkMethodAsync(3);
-    }
-    ~WithAsyncMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestUnFollow(::grpc::ServerContext* context, ::csce438::Request* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithAsyncMethod_Timeline : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Timeline() {
-      ::grpc::Service::MarkMethodAsync(4);
+      ::grpc::Service::MarkMethodAsync(3);
     }
     ~WithAsyncMethod_Timeline() override {
       BaseClassMustBeDerivedFromService(this);
@@ -294,10 +247,10 @@ class SNSService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestTimeline(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::csce438::Message, ::csce438::Message>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncBidiStreaming(4, context, stream, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Login<WithAsyncMethod_List<WithAsyncMethod_Follow<WithAsyncMethod_UnFollow<WithAsyncMethod_Timeline<Service > > > > > AsyncService;
+  typedef WithAsyncMethod_Login<WithAsyncMethod_List<WithAsyncMethod_Follow<WithAsyncMethod_Timeline<Service > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Login : public BaseClass {
    private:
@@ -380,39 +333,12 @@ class SNSService final {
       ::grpc::CallbackServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithCallbackMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_UnFollow() {
-      ::grpc::Service::MarkMethodCallback(3,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) { return this->UnFollow(context, request, response); }));}
-    void SetMessageAllocatorFor_UnFollow(
-        ::grpc::MessageAllocator< ::csce438::Request, ::csce438::Reply>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* UnFollow(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
   class WithCallbackMethod_Timeline : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Timeline() {
-      ::grpc::Service::MarkMethodCallback(4,
+      ::grpc::Service::MarkMethodCallback(3,
           new ::grpc::internal::CallbackBidiHandler< ::csce438::Message, ::csce438::Message>(
             [this](
                    ::grpc::CallbackServerContext* context) { return this->Timeline(context); }));
@@ -429,7 +355,7 @@ class SNSService final {
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
-  typedef WithCallbackMethod_Login<WithCallbackMethod_List<WithCallbackMethod_Follow<WithCallbackMethod_UnFollow<WithCallbackMethod_Timeline<Service > > > > > CallbackService;
+  typedef WithCallbackMethod_Login<WithCallbackMethod_List<WithCallbackMethod_Follow<WithCallbackMethod_Timeline<Service > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Login : public BaseClass {
@@ -483,29 +409,12 @@ class SNSService final {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_UnFollow() {
-      ::grpc::Service::MarkMethodGeneric(3);
-    }
-    ~WithGenericMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
   class WithGenericMethod_Timeline : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Timeline() {
-      ::grpc::Service::MarkMethodGeneric(4);
+      ::grpc::Service::MarkMethodGeneric(3);
     }
     ~WithGenericMethod_Timeline() override {
       BaseClassMustBeDerivedFromService(this);
@@ -577,32 +486,12 @@ class SNSService final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_UnFollow() {
-      ::grpc::Service::MarkMethodRaw(3);
-    }
-    ~WithRawMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestUnFollow(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithRawMethod_Timeline : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Timeline() {
-      ::grpc::Service::MarkMethodRaw(4);
+      ::grpc::Service::MarkMethodRaw(3);
     }
     ~WithRawMethod_Timeline() override {
       BaseClassMustBeDerivedFromService(this);
@@ -613,7 +502,7 @@ class SNSService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestTimeline(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncBidiStreaming(4, context, stream, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -683,34 +572,12 @@ class SNSService final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_UnFollow() {
-      ::grpc::Service::MarkMethodRawCallback(3,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->UnFollow(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* UnFollow(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
   class WithRawCallbackMethod_Timeline : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Timeline() {
-      ::grpc::Service::MarkMethodRawCallback(4,
+      ::grpc::Service::MarkMethodRawCallback(3,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context) { return this->Timeline(context); }));
@@ -808,36 +675,9 @@ class SNSService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedFollow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::Request,::csce438::Reply>* server_unary_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_UnFollow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithStreamedUnaryMethod_UnFollow() {
-      ::grpc::Service::MarkMethodStreamed(3,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::csce438::Request, ::csce438::Reply>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::csce438::Request, ::csce438::Reply>* streamer) {
-                       return this->StreamedUnFollow(context,
-                         streamer);
-                  }));
-    }
-    ~WithStreamedUnaryMethod_UnFollow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status UnFollow(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedUnFollow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::Request,::csce438::Reply>* server_unary_streamer) = 0;
-  };
-  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<WithStreamedUnaryMethod_UnFollow<Service > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<Service > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<WithStreamedUnaryMethod_UnFollow<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<Service > > > StreamedService;
 };
 
 // Master/Slave Interaction
@@ -2370,6 +2210,13 @@ class SNSFollower final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncFollowing(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncFollowingRaw(context, request, cq));
     }
+    virtual ::grpc::Status newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncnewMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncnewMessageRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncnewMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncnewMessageRaw(context, request, cq));
+    }
     virtual ::grpc::Status newClient(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::Blep* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncnewClient(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncnewClientRaw(context, request, cq));
@@ -2382,6 +2229,8 @@ class SNSFollower final {
       virtual ~async_interface() {}
       virtual void Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
       virtual void newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
@@ -2391,6 +2240,8 @@ class SNSFollower final {
    private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) = 0;
   };
@@ -2404,6 +2255,13 @@ class SNSFollower final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncFollowing(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncFollowingRaw(context, request, cq));
     }
+    ::grpc::Status newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncnewMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncnewMessageRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncnewMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncnewMessageRaw(context, request, cq));
+    }
     ::grpc::Status newClient(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::csce438::Blep* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncnewClient(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncnewClientRaw(context, request, cq));
@@ -2416,6 +2274,8 @@ class SNSFollower final {
      public:
       void Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
       void Following(::grpc::ClientContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
+      void newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
       void newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
       void newClient(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
@@ -2431,9 +2291,12 @@ class SNSFollower final {
     class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncnewClientRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Following_;
+    const ::grpc::internal::RpcMethod rpcmethod_newMessage_;
     const ::grpc::internal::RpcMethod rpcmethod_newClient_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
@@ -2443,6 +2306,7 @@ class SNSFollower final {
     Service();
     virtual ~Service();
     virtual ::grpc::Status Following(::grpc::ServerContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response);
+    virtual ::grpc::Status newMessage(::grpc::ServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response);
     virtual ::grpc::Status newClient(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response);
   };
   template <class BaseClass>
@@ -2466,12 +2330,32 @@ class SNSFollower final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_newMessage() {
+      ::grpc::Service::MarkMethodAsync(1);
+    }
+    ~WithAsyncMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestnewMessage(::grpc::ServerContext* context, ::csce438::MsgChunk* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_newClient() {
-      ::grpc::Service::MarkMethodAsync(1);
+      ::grpc::Service::MarkMethodAsync(2);
     }
     ~WithAsyncMethod_newClient() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2482,10 +2366,10 @@ class SNSFollower final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestnewClient(::grpc::ServerContext* context, ::csce438::JoinReq* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Following<WithAsyncMethod_newClient<Service > > AsyncService;
+  typedef WithAsyncMethod_Following<WithAsyncMethod_newMessage<WithAsyncMethod_newClient<Service > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Following : public BaseClass {
    private:
@@ -2514,18 +2398,45 @@ class SNSFollower final {
       ::grpc::CallbackServerContext* /*context*/, const ::csce438::FollowPair* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithCallbackMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_newMessage() {
+      ::grpc::Service::MarkMethodCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response) { return this->newMessage(context, request, response); }));}
+    void SetMessageAllocatorFor_newMessage(
+        ::grpc::MessageAllocator< ::csce438::MsgChunk, ::csce438::Blep>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* newMessage(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithCallbackMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_newClient() {
-      ::grpc::Service::MarkMethodCallback(1,
+      ::grpc::Service::MarkMethodCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::csce438::JoinReq, ::csce438::Blep>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::csce438::JoinReq* request, ::csce438::Blep* response) { return this->newClient(context, request, response); }));}
     void SetMessageAllocatorFor_newClient(
         ::grpc::MessageAllocator< ::csce438::JoinReq, ::csce438::Blep>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::JoinReq, ::csce438::Blep>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -2540,7 +2451,7 @@ class SNSFollower final {
     virtual ::grpc::ServerUnaryReactor* newClient(
       ::grpc::CallbackServerContext* /*context*/, const ::csce438::JoinReq* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_Following<WithCallbackMethod_newClient<Service > > CallbackService;
+  typedef WithCallbackMethod_Following<WithCallbackMethod_newMessage<WithCallbackMethod_newClient<Service > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Following : public BaseClass {
@@ -2560,12 +2471,29 @@ class SNSFollower final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_newMessage() {
+      ::grpc::Service::MarkMethodGeneric(1);
+    }
+    ~WithGenericMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_newClient() {
-      ::grpc::Service::MarkMethodGeneric(1);
+      ::grpc::Service::MarkMethodGeneric(2);
     }
     ~WithGenericMethod_newClient() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2597,12 +2525,32 @@ class SNSFollower final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_newMessage() {
+      ::grpc::Service::MarkMethodRaw(1);
+    }
+    ~WithRawMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestnewMessage(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_newClient() {
-      ::grpc::Service::MarkMethodRaw(1);
+      ::grpc::Service::MarkMethodRaw(2);
     }
     ~WithRawMethod_newClient() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2613,7 +2561,7 @@ class SNSFollower final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestnewClient(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2639,12 +2587,34 @@ class SNSFollower final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_newMessage() {
+      ::grpc::Service::MarkMethodRawCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->newMessage(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* newMessage(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithRawCallbackMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_newClient() {
-      ::grpc::Service::MarkMethodRawCallback(1,
+      ::grpc::Service::MarkMethodRawCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->newClient(context, request, response); }));
@@ -2688,12 +2658,39 @@ class SNSFollower final {
     virtual ::grpc::Status StreamedFollowing(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::FollowPair,::csce438::Blep>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_newMessage : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_newMessage() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::csce438::MsgChunk, ::csce438::Blep>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::csce438::MsgChunk, ::csce438::Blep>* streamer) {
+                       return this->StreamednewMessage(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_newMessage() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status newMessage(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamednewMessage(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::MsgChunk,::csce438::Blep>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_newClient : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_newClient() {
-      ::grpc::Service::MarkMethodStreamed(1,
+      ::grpc::Service::MarkMethodStreamed(2,
         new ::grpc::internal::StreamedUnaryHandler<
           ::csce438::JoinReq, ::csce438::Blep>(
             [this](::grpc::ServerContext* context,
@@ -2714,9 +2711,9 @@ class SNSFollower final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamednewClient(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::JoinReq,::csce438::Blep>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Following<WithStreamedUnaryMethod_newClient<Service > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Following<WithStreamedUnaryMethod_newMessage<WithStreamedUnaryMethod_newClient<Service > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Following<WithStreamedUnaryMethod_newClient<Service > > StreamedService;
+  typedef WithStreamedUnaryMethod_Following<WithStreamedUnaryMethod_newMessage<WithStreamedUnaryMethod_newClient<Service > > > StreamedService;
 };
 
 }  // namespace csce438

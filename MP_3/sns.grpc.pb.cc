@@ -25,7 +25,6 @@ static const char* SNSService_method_names[] = {
   "/csce438.SNSService/Login",
   "/csce438.SNSService/List",
   "/csce438.SNSService/Follow",
-  "/csce438.SNSService/UnFollow",
   "/csce438.SNSService/Timeline",
 };
 
@@ -39,8 +38,7 @@ SNSService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel
   : channel_(channel), rpcmethod_Login_(SNSService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_List_(SNSService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_Follow_(SNSService_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UnFollow_(SNSService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Timeline_(SNSService_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_Timeline_(SNSService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
   {}
 
 ::grpc::Status SNSService::Stub::Login(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) {
@@ -112,29 +110,6 @@ void SNSService::Stub::async::Follow(::grpc::ClientContext* context, const ::csc
   return result;
 }
 
-::grpc::Status SNSService::Stub::UnFollow(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_UnFollow_, context, request, response);
-}
-
-void SNSService::Stub::async::UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_UnFollow_, context, request, response, std::move(f));
-}
-
-void SNSService::Stub::async::UnFollow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_UnFollow_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSService::Stub::PrepareAsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Reply, ::csce438::Request, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_UnFollow_, context, request);
-}
-
-::grpc::ClientAsyncResponseReader< ::csce438::Reply>* SNSService::Stub::AsyncUnFollowRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-  auto* result =
-    this->PrepareAsyncUnFollowRaw(context, request, cq);
-  result->StartCall();
-  return result;
-}
-
 ::grpc::ClientReaderWriter< ::csce438::Message, ::csce438::Message>* SNSService::Stub::TimelineRaw(::grpc::ClientContext* context) {
   return ::grpc::internal::ClientReaderWriterFactory< ::csce438::Message, ::csce438::Message>::Create(channel_.get(), rpcmethod_Timeline_, context);
 }
@@ -184,16 +159,6 @@ SNSService::Service::Service() {
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSService_method_names[3],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< SNSService::Service, ::csce438::Request, ::csce438::Reply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
-          [](SNSService::Service* service,
-             ::grpc::ServerContext* ctx,
-             const ::csce438::Request* req,
-             ::csce438::Reply* resp) {
-               return service->UnFollow(ctx, req, resp);
-             }, this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      SNSService_method_names[4],
       ::grpc::internal::RpcMethod::BIDI_STREAMING,
       new ::grpc::internal::BidiStreamingHandler< SNSService::Service, ::csce438::Message, ::csce438::Message>(
           [](SNSService::Service* service,
@@ -222,13 +187,6 @@ SNSService::Service::~Service() {
 }
 
 ::grpc::Status SNSService::Service::Follow(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
-::grpc::Status SNSService::Service::UnFollow(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) {
   (void) context;
   (void) request;
   (void) response;
@@ -660,6 +618,7 @@ SNSCoord::Service::~Service() {
 
 static const char* SNSFollower_method_names[] = {
   "/csce438.SNSFollower/Following",
+  "/csce438.SNSFollower/newMessage",
   "/csce438.SNSFollower/newClient",
 };
 
@@ -671,7 +630,8 @@ std::unique_ptr< SNSFollower::Stub> SNSFollower::NewStub(const std::shared_ptr< 
 
 SNSFollower::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_Following_(SNSFollower_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_newClient_(SNSFollower_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_newMessage_(SNSFollower_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_newClient_(SNSFollower_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status SNSFollower::Stub::Following(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::csce438::Blep* response) {
@@ -693,6 +653,29 @@ void SNSFollower::Stub::async::Following(::grpc::ClientContext* context, const :
 ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::AsyncFollowingRaw(::grpc::ClientContext* context, const ::csce438::FollowPair& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncFollowingRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status SNSFollower::Stub::newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_newMessage_, context, request, response);
+}
+
+void SNSFollower::Stub::async::newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_newMessage_, context, request, response, std::move(f));
+}
+
+void SNSFollower::Stub::async::newMessage(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_newMessage_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::PrepareAsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::Blep, ::csce438::MsgChunk, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_newMessage_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::Blep>* SNSFollower::Stub::AsyncnewMessageRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncnewMessageRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -734,6 +717,16 @@ SNSFollower::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSFollower_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSFollower::Service, ::csce438::MsgChunk, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSFollower::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::MsgChunk* req,
+             ::csce438::Blep* resp) {
+               return service->newMessage(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSFollower_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< SNSFollower::Service, ::csce438::JoinReq, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](SNSFollower::Service* service,
              ::grpc::ServerContext* ctx,
@@ -747,6 +740,13 @@ SNSFollower::Service::~Service() {
 }
 
 ::grpc::Status SNSFollower::Service::Following(::grpc::ServerContext* context, const ::csce438::FollowPair* request, ::csce438::Blep* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSFollower::Service::newMessage(::grpc::ServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response) {
   (void) context;
   (void) request;
   (void) response;

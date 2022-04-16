@@ -83,7 +83,7 @@ std::map<int, struct clustinfo *> c_map;
 std::map<int, struct flwr *> f_map;
 
 //Maps Client IDs to followers
-std::map<int, struct flwwr *> l_map;
+std::map<int, struct flwr *> l_map;
 
 class SNSCoordImpl final : public SNSCoord::Service
 {
@@ -196,7 +196,7 @@ class SNSCoordImpl final : public SNSCoord::Service
             response->set_sid(cid);
         }
         catch (const std::out_of_range& oor){
-            std::cerr << "GetFollowing:\n"
+            std::cerr << "GetFollowing:\n";
             std::cerr << "Bad client id '" << cid << std::endl;
             return Status::CANCELLED;
         }
@@ -205,8 +205,9 @@ class SNSCoordImpl final : public SNSCoord::Service
 
     Status FollowerSpawn(ServerContext *context, const FollowerInfo* request, Blep* response) override
     {
+        struct flwr *f = nullptr;
         try{
-            struct flwr *f = new flwr;
+            f = new flwr;
 
             f->id = request->id();
             f->addr = request->addr();
@@ -218,7 +219,7 @@ class SNSCoordImpl final : public SNSCoord::Service
             f->cif->follower = f;
         }
         catch (const std::out_of_range& oor){
-            std::cerr << "FollowerSpawn:\n"
+            std::cerr << "FollowerSpawn:\n";
             std::cerr << "Bad server id '" << request->sid() << "' sent from follower '" << f->id << "'" << std::endl;
             std::cerr << "Addr was: " << f->addr << std::endl;
             std::cerr << "Port was: " << f->port << std::endl;
