@@ -50,6 +50,9 @@ std::set<int> client_ids;
 //Stub
 std::unique_ptr<csce438::SNSCoord::Stub> c_stub;
 
+void checkFollowUpdates(int);
+void checkTimelineUpdates(int);
+
 class SNSFollowerImpl final : public SNSFollower::Service{
     Status Following(ServerContext *context, const FollowPair* request, Blep* response) override {
         int id = request->id();
@@ -68,21 +71,35 @@ class SNSFollowerImpl final : public SNSFollower::Service{
     }
     Status newClient(ServerContext *context, const JoinReq* request, Blep* response) override {
         int id = request->id();
-        client_ids.insert(id);
-        std::thread t1(checkFollowUpdates, id);
-        std::thread t2(checkTimelineUpdates, id);
-        t1.detach();
-        t2.detach();
-        return Status::OK;
+        std::cout << "Inserting a new Client: " << id << std::endl;
+        if(client_ids.insert(id).second){
+            std::thread t1(checkFollowUpdates, id);
+            std::thread t2(checkTimelineUpdates, id);
+            t1.detach();
+            t2.detach();
+            return Status::OK;
+        }
+        else {
+            std::cout << "The new client" << id << "already existed" << std::endl;
+            return Status::CANCELLED;
+        }
+        
     }
     Status newMessage(ServerContext *context, const MsgChunk* request, Blep* response) override {
         int recv_id = request->id();
+        std::cout << "New Message(s) have arrived for " << recv_id << std::endl;
+        if (!client_ids.count(recv_id)) {
+            std::cerr << "Message recipiant " << recv_id << " is not managed by this follower" << std::endl;
+            std::cerr << "Did the coordinator screw up?\n";
+            return Status::CANCELLED;
+        }
         //distribute the new messages to the follower
         std::ofstream ofs(std::to_string(recv_id) + "fTimlines.txt", std::ios::app | std::ios::out | std::ios::in);
         for (auto msg : request->msgs()){
             ofs << msg << std::endl;
         }
         ofs.close();
+        return Status::OK;
     }
 };
 
@@ -103,6 +120,7 @@ void checkFollowUpdates(int uid) {
         last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
         now = std::chrono::system_clock::now().time_since_epoch().count();
         if (now - last_write < 30000000000){ //if there's been less than 30 seconds since last edit
+            std::cout << "An follower update was detected for " << uid << std::endl;
             //Figure out new follower(s)
             std::set<int> fol;
             std::ifstream ifs(std::to_string(uid)+"follows.txt");
@@ -135,6 +153,8 @@ void checkFollowUpdates(int uid) {
 
                     Status status = c_stub->GetFollowing(&context, jr, &ci);
                     if (!status.ok()) continue;
+                    
+                    std::cout << "Notifying follower " << ci.id() << " that " << i << " is followed by " << uid << std::endl;
 
                     //RPC the follower to send the update
                     std::string f_login_info = ci.addr() + ":" + ci.port();
@@ -163,6 +183,7 @@ void checkTimelineUpdates(int uid){
         last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
         now = std::chrono::system_clock::now().time_since_epoch().count();
         if (now - last_write < 30000000000){
+            std::cout << "An update was found in " << uid << "'s timeline." << std::endl;
             //Grab the posts
             std::ifstream ifs(std::to_string(uid)+"timeline.txt");
             std::stack<std::string> posts;
@@ -206,6 +227,7 @@ void checkTimelineUpdates(int uid){
             //Broadcast our messages
             ClientContext context;
             for (int f : followers){
+                std::cout << "Informing follower " << f << " about client " << uid << "'s update." << std::endl;
                 //Who does this belong to?
                 JoinReq jr;
                 FollowerInfo fi;
@@ -246,25 +268,42 @@ void RunServer(std::string port_no){
     std::string c_login_info = c_hostname + ":" + c_port;
     c_stub = std::unique_ptr<SNSCoord::Stub>(SNSCoord::NewStub(grpc::CreateChannel(c_login_info, grpc::InsecureChannelCredentials())));
 
+    //Spawn Follower for Coordinator
+    ClientContext context;
+    FollowerInfo fi;
+    fi.set_addr("127.0.0.1"); //TEMPORARY, use a getaddrinfo later
+    fi.set_port(port_no);
+    fi.set_id(f_id);
+    fi.set_sid(s_id);
+    Blep b;
+    std::cout << "Contacing Coordinator to Spawn Follower..." << std::endl;
+    Status s = c_stub->FollowerSpawn(&context, fi, &b);
+    if(!s.ok()) {
+        std::cerr << "Fatal Error: coudl not spawn follower" << std::endl;
+        std::cerr << "c_stub was craeted with: " << c_login_info << std::endl;
+        std::cerr << "Follower's port was: " << port_no << std::endl;
+    }
+    std::cout << "SUCCESS!" << std::endl;
+
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     std::unique_ptr<Server> server(builder.BuildAndStart());
-    std::cout << "Coordinator listening on " << server_address << std::endl;
+    std::cout << "Synchonizer listening on " << server_address << std::endl;
 
     server->Wait();
 }
 
 int main(int argc, char **argv)
 {
-    if (argc != 9)
+    if (argc < 7)
     {
         printUsage();
     }
 
     std::string port = "3011";
 
-    c_hostname = "";
+    c_hostname = "127.0.0.1";
     c_port = "";
     f_id = -1;
 
@@ -306,6 +345,8 @@ int main(int argc, char **argv)
             i++;
         }
     }
+
+    RunServer(port);
 
     return 0;
 }

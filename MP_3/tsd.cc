@@ -35,8 +35,8 @@ struct Client
     int username;
     bool connected = true;
     int following_file_size = 0;
-    std::vector<Client *> client_followers;
-    std::vector<Client *> client_following;
+    std::vector<int> client_followers;
+    std::vector<int> client_following;
     ServerReaderWriter<Message, Message> *stream = 0;
     bool operator==(const Client &c1) const
     {
@@ -48,9 +48,14 @@ struct Client
 std::string c_hostname;
 std::string c_port;
 
+//Stubs
+std::unique_ptr<csce438::SNSCoord::Stub> c_stub; //Coordinator
+std::unique_ptr<csce438::SNSSandMInform::Stub> s_stub = nullptr; //slave/master
+
 // Meta Server info
 int s_id;
 bool isMaster;
+std::string my_port;
 
 //Meta Slave info
 std::string slave_port;
@@ -79,7 +84,7 @@ static void populate_following(int username, int userindex){
         while(!fol_f.eof()) {
             std::getline(fol_f, u_id, ',');
             if (fol_f.fail()) break;
-            client_db[userindex].client_following.push_back(&client_db[find_user(atoi(u_id.c_str()))]);
+            client_db[userindex].client_following.push_back(atoi(u_id.c_str()));
         }
         fol_f.close();
     }
@@ -89,7 +94,7 @@ static void populate_following(int username, int userindex){
         while(!flb_f.eof()) {
             std::getline(flb_f, u_id, ',');
             if (flb_f.fail()) break;
-            client_db[userindex].client_followers.push_back(&client_db[find_user(atoi(u_id.c_str()))]);
+            client_db[userindex].client_followers.push_back(atoi(u_id.c_str()));
         }
         flb_f.close();
     }
@@ -132,10 +137,10 @@ class SNSServiceImpl final : public SNSService::Service
         {
             list_reply->add_all_users(c.username);
         }
-        std::vector<Client *>::const_iterator it;
+        std::vector<int>::const_iterator it;
         for (it = user.client_followers.begin(); it != user.client_followers.end(); it++)
         {
-            list_reply->add_followers((*it)->username);
+            list_reply->add_followers(*it);
         }
         return Status::OK;
     }
@@ -143,32 +148,82 @@ class SNSServiceImpl final : public SNSService::Service
     Status Follow(ServerContext *context, const Request *request, Reply *reply) override
     {
         int username1 = request->username();
-        int username2 = request->arguments(0);
-        int join_index = find_user(username2);
-        if (join_index < 0 || username1 == username2)
+        int toFollow = request->arguments(0);
+        int join_index = find_user(toFollow);
+        if (join_index < 0 && username1 != toFollow){
+            Client *user1 = &client_db[find_user(username1)];
+            if (std::find(user1->client_following.begin(), user1->client_following.end(), toFollow) != user1->client_following.end())
+            {
+                reply->set_msg("you have already joined");
+                return Status::OK;
+            }
+            user1->client_following.push_back(toFollow);
+            reply->set_msg("Follow Successful");
+            std::ofstream fol_s (std::to_string(username1) + "follows.txt", std::ios::app | std::ios::out | std::ios::in);
+            fol_s << toFollow << ",";
+            fol_s.close();
+            //Update slave
+            if (s_stub != nullptr){
+                FollowData fi1;
+                fi1.set_id(username1);
+                std::copy(user1->client_following.begin(), user1->client_following.end(), fi1.mutable_following()->begin());
+                std::copy(user1->client_followers.begin(), user1->client_followers.end(), fi1.mutable_followers()->begin());
+
+                Blep b1;
+                ClientContext context;
+
+                s_stub->FollowUpdate(&context, fi1, &b1);
+            }
+        }
+        else if (join_index < 0)
             reply->set_msg("unkown user name");
         else
         {
             Client *user1 = &client_db[find_user(username1)];
             Client *user2 = &client_db[join_index];
-            if (std::find(user1->client_following.begin(), user1->client_following.end(), user2) != user1->client_following.end())
+            if (std::find(user1->client_following.begin(), user1->client_following.end(), toFollow) != user1->client_following.end())
             {
                 reply->set_msg("you have already joined");
                 return Status::OK;
             }
-            user1->client_following.push_back(user2);
-            user2->client_followers.push_back(user1);
+            user1->client_following.push_back(toFollow);
+            user2->client_followers.push_back(username1);
             reply->set_msg("Follow Successful");
             std::ofstream fol_s (std::to_string(username1) + "follows.txt", std::ios::app | std::ios::out | std::ios::in);
-            fol_s << username2 << ",";
+            fol_s << toFollow << ",";
             fol_s.close();
+            //Update slave
+            if (s_stub != nullptr){
+                FollowData fi1;
+                fi1.set_id(username1);
+                std::copy(user1->client_following.begin(), user1->client_following.end(), fi1.mutable_following()->begin());
+                std::copy(user1->client_followers.begin(), user1->client_followers.end(), fi1.mutable_followers()->begin());
+
+                FollowData fi2;
+                fi2.set_id(toFollow);
+                std::copy(user2->client_following.begin(), user2->client_following.end(), fi2.mutable_following()->begin());
+                std::copy(user2->client_followers.begin(), user2->client_followers.end(), fi2.mutable_followers()->begin());
+
+                Blep b1, b2;
+                ClientContext context;
+
+                s_stub->FollowUpdate(&context, fi1, &b1);
+                s_stub->FollowUpdate(&context, fi2, &b2);
+            }
         }
+        
         return Status::OK;
     }
 
     Status Login(ServerContext *context, const Request *request, Reply *reply) override
     {
         login_help(request, reply);
+
+        if (s_stub != nullptr){
+            ClientContext cc;
+            s_stub->LoginUpdate(&cc, *request, reply);
+        }
+
         return Status::OK;
     }
 
@@ -183,8 +238,8 @@ class SNSServiceImpl final : public SNSService::Service
             int user_index = find_user(username);
             c = &client_db[user_index];
 
-            // Write the current message to "username.txt"
-            std::string filename = std::to_string(username) + ".txt";
+            // Write the current message to "usernametimeline.txt"
+            std::string filename = std::to_string(username) + "timeline.txt";
             std::ofstream user_file(filename, std::ios::app | std::ios::out | std::ios::in);
             google::protobuf::Timestamp temptime = message.timestamp();
             std::string time = google::protobuf::util::TimeUtil::ToString(temptime);
@@ -199,9 +254,9 @@ class SNSServiceImpl final : public SNSService::Service
                     c->stream = stream;
                 std::string line;
                 std::vector<std::string> newest_twenty;
-                std::ifstream in(std::to_string(username) + "following.txt");
+                std::ifstream in(std::to_string(username) + "fTimelines.txt");
                 int count = 0;
-                // Read the last up-to-20 lines (newest 20 messages) from userfollowing.txt
+                // Read the last up-to-20 lines (newest 20 messages) from userfTimelines.txt
                 while (getline(in, line))
                 {
                     if (c->following_file_size > 20)
@@ -224,20 +279,20 @@ class SNSServiceImpl final : public SNSService::Service
                 continue;
             }
             // Send the message to each follower's stream
-            std::vector<Client *>::const_iterator it;
+            std::vector<int>::const_iterator it;
             for (it = c->client_followers.begin(); it != c->client_followers.end(); it++)
             {
-                Client *temp_client = *it;
+                Client *temp_client = &client_db[find_user(*it)];
                 if (temp_client->stream != 0 && temp_client->connected)
                     temp_client->stream->Write(message);
                 // For each of the current user's followers, put the message in their following.txt file
-                std::string temp_username = std::to_string(temp_client->username);
-                std::string temp_file = temp_username + "following.txt";
-                std::ofstream following_file(temp_file, std::ios::app | std::ios::out | std::ios::in);
-                following_file << fileinput;
-                temp_client->following_file_size++;
-                std::ofstream user_file(temp_username + ".txt", std::ios::app | std::ios::out | std::ios::in);
-                user_file << fileinput;
+                // std::string temp_username = std::to_string(temp_client->username);
+                // std::string temp_file = temp_username + "fTimelines.txt";
+                // std::ofstream following_file(temp_file, std::ios::app | std::ios::out | std::ios::in);
+                // following_file << fileinput;
+                // temp_client->following_file_size++;
+                // std::ofstream user_file(temp_username + ".txt", std::ios::app | std::ios::out | std::ios::in);
+                // user_file << fileinput;
             }
         }
         // If the client disconnected from Chat Mode, set connected to false
@@ -253,12 +308,18 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
     {
         slave_port = request->port();
         slave_addr = request->addr();
+        std::string s_login_info = slave_addr + ":" + slave_port;
+        s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
+
+        std::cout << "Slave process has made contact" << std::endl;
+
         return Status::OK;
     }
 
     Status FollowUpdate(ServerContext *context, const FollowData *request, Blep *response) override
     {
-        int u_index = find_user(request->id());
+        int id = request->id();
+        int u_index = find_user(id);
         std::vector<int> followers;
         auto fllrs = request->followers();
         std::vector<int> following;
@@ -270,14 +331,17 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
         client_db[u_index].client_followers.clear();
         client_db[u_index].client_following.clear();
 
-        for (int s : followers) client_db[u_index].client_followers.push_back(&client_db[find_user(s)]);
-        for (int s : following) client_db[u_index].client_following.push_back(&client_db[find_user(s)]);
-    
+        for (int s : followers) client_db[u_index].client_followers.push_back(s);
+        for (int s : following) client_db[u_index].client_following.push_back(s);
+
+        std::cout << "Updated Following info for " << id << std::endl;
+
         return Status::OK;
     }
 
     Status TimelineUpdate(ServerContext *context, const MsgChunk *request, Blep *response) override
     {
+        //Shouldn't actually be use din our implementation as we assume that master/slave share a machine
         std::vector<std::string> messages;
         auto msgs = request->msgs();
 
@@ -299,25 +363,40 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
     };
 };
 
-std::unique_ptr<SNSCoord::Stub> getCoordStub()
-{
-    // Uses coordinate IP info to connect to it and send the necessary RPC messages
-}
-
 void RunServer(std::string port_no)
 {
     std::string server_address = "0.0.0.0:" + port_no;
     SNSServiceImpl service;
 
-    //TODO: 
-    //Make a coordinator Stub
-    //Make an SandMInform stub?
-    //Try and spawn a cluster
-    //If Master
-        //Continue with building server etc
-    //If Slave
-        //PokeMaster teh pass along credential
-        //Continue building etc
+    //Coordinator Stub
+    std::cout << "creating coordinator stub" << std::endl;
+    std::string c_login_info = c_hostname + ":" + c_port;
+    c_stub = std::unique_ptr<SNSCoord::Stub>(SNSCoord::NewStub(grpc::CreateChannel(c_login_info, grpc::InsecureChannelCredentials())));
+
+    ClientContext context;
+    Status s;
+    ClusterInfo ci;
+    ci.set_addr("127.0.0.1"); //Later get own hostname!!!
+    ci.set_port(port_no);
+    ci.set_id(s_id);
+    ServerIdent si;
+    std::cout << "Attempting to spawn cluster..." << std::endl;
+    s = c_stub->ClusterSpawn(&context, ci, &si);
+    if (!s.ok()) {
+        std::cerr << "Fatal error, server '" << s_id << "' failed to spawn cluster." << std::endl;
+    }
+    std::cout << "SUCCESS!" << std::endl;
+    if (!si.master()){
+        //SandMInform stub
+        std::string s_login_info = si.addr() + ":" + si.port();
+        s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
+
+        ServerIdent slave_id;
+        slave_id.set_port(my_port);
+        slave_id.set_addr("127.0.0.1"); //For this implementation the address will always be local! Change for multiple machining
+        ServerIdent r_id;
+        s_stub->PokeMaster(&context, si, &r_id);
+    }
 
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -343,14 +422,14 @@ void printUsage(std::string arg = "")
 int main(int argc, char **argv)
 {
 
-    if (argc != 11)
+    if (argc < 9)
     {
         printUsage();
     }
 
-    std::string port = "3010";
+    my_port = "3010";
 
-    c_hostname = "";
+    c_hostname = "127.0.0.1";
     c_port = "";
     s_id = -1;
     isMaster = false;
@@ -378,8 +457,8 @@ int main(int argc, char **argv)
         }
         else if (arg == "-p")
         {
-            port = argv[i + 1];
-            if (port.size() > 6)
+            my_port = argv[i + 1];
+            if (my_port.size() > 6)
                 printUsage(arg);
             i++;
         }
@@ -405,7 +484,7 @@ int main(int argc, char **argv)
         }
     }
 
-    RunServer(port);
+    RunServer(my_port);
 
     return 0;
 }

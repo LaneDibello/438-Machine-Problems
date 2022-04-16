@@ -8,11 +8,6 @@
 #include "client.h"
 
 #include "sns.grpc.pb.h"
-using csce438::ListReply;
-using csce438::Message;
-using csce438::Reply;
-using csce438::Request;
-using csce438::SNSService;
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -20,12 +15,16 @@ using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
 using grpc::Status;
 
+using namespace csce438;
+
 // Coord info
 std::string c_hostname;
 std::string c_port;
 
 // Meta Client Info
 int c_id;
+std::unique_ptr<csce438::SNSCoord::Stub> c_stub;
+
 
 Message MakeMessage(const int &username, const std::string &msg)
 {
@@ -48,6 +47,8 @@ public:
         : hostname(hname), username(uname), port(p)
     {
     }
+
+    void renew_connection();
 
 protected:
     virtual int connectTo();
@@ -83,12 +84,12 @@ void printUsage(std::string arg = "")
 int main(int argc, char **argv)
 {
 
-    if (argc != 7)
+    if (argc < 5)
     {
         printUsage();
     }
 
-    c_hostname = "localhost";
+    c_hostname = "127.0.0.1";
     c_port = "3010";
     c_id = -1;
 
@@ -133,12 +134,50 @@ int main(int argc, char **argv)
     return 0;
 }
 
+void Client::renew_connection(){
+    //Every 10 seconsd check with the corrdinator to make sure master didn't die
+    for(;;){
+        sleep(10);
+        ClientContext context;
+        JoinReq jr;
+        jr.set_id(c_id);
+        ClusterInfo ci;
+        c_stub->GetConnection(&context, jr, &ci);
+
+        if (port != ci.port() || hostname != ci.addr()){
+            std::string login_info = ci.addr() + ":" + ci.port();
+            stub_ = std::unique_ptr<SNSService::Stub>(SNSService::NewStub(
+                grpc::CreateChannel(
+                    login_info, grpc::InsecureChannelCredentials())));
+
+            hostname = ci.addr();
+            port = ci.port();
+        }
+    }
+}
+
 int Client::connectTo()
 {
-    std::string login_info = hostname + ":" + port;
+    //Coordinator Stub
+    std::string c_login_info = c_hostname + ":" + c_port;
+    c_stub = std::unique_ptr<SNSCoord::Stub>(SNSCoord::NewStub(grpc::CreateChannel(c_login_info, grpc::InsecureChannelCredentials())));
+
+    ClientContext context;
+    JoinReq jr;
+    jr.set_id(c_id);
+    ClusterInfo ci;
+    c_stub->GetConnection(&context, jr, &ci);
+    
+    std::string login_info = ci.addr() + ":" + ci.port();
     stub_ = std::unique_ptr<SNSService::Stub>(SNSService::NewStub(
         grpc::CreateChannel(
             login_info, grpc::InsecureChannelCredentials())));
+
+    hostname = ci.addr();
+    port = ci.port();
+
+    std::thread t(&Client::renew_connection, this);
+    t.detach();
 
     IReply ire = Login();
     if (!ire.grpc_status.ok())

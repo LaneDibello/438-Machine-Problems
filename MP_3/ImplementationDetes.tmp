@@ -1,0 +1,15 @@
+User files (stored with server):
+    <uid>followedBy.txt - csv of users that follow them
+    <uid>follows.txt - csv of users they follow
+    <uid>timeline.txt - A user's personal timeline
+    <uid>fTimelines.txt - A conglomerate of the timelines of users they follow
+
+TODO:
+Put some mutexes in place for thread safety
+
+
+Usages:
+$./coordinator -p <portNum>
+$./server -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <idNum> -t <master/slave>
+$./synchronizer -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <synchronizerId>
+$./client -cip <coordinatorIP> -cp <coordinatorPort> -id <clientId>

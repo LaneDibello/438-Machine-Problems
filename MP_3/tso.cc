@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <map>
+#include <set>
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
@@ -31,15 +32,6 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
-// using csce438::Message;
-// using csce438::ListReply;
-// using csce438::Request;
-// using csce438::Reply;
-// using csce438::SNSService;
-// using csce438::SNSCoord;
-// using csce438::ClusterInfo;
-// using csce438::JoinReq;
-// using csce438::HrtBt;
 
 using namespace csce438;
 
@@ -101,6 +93,8 @@ class SNSCoordImpl final : public SNSCoord::Service
             response->set_addr(cif->master_addr);
             response->set_port(cif->master_port);
             response->set_master(false);
+
+            std::cout << "Slave has arrived for " << id << std::endl;
         }
         catch (const std::out_of_range &oor) // Otherwise, make a new obj for the master
         {
@@ -109,6 +103,8 @@ class SNSCoordImpl final : public SNSCoord::Service
             cif->master_port = request->port();
             cif->master_live = true;
             c_map[id] = cif;
+
+            std::cout << "Spawning Cluster: " << id << std::endl;
 
             std::thread t(checkCluster, cif); // start waiting for heartbeat if it's the master
             t.detach();
@@ -139,6 +135,8 @@ class SNSCoordImpl final : public SNSCoord::Service
 
             cif->follower->client_ids.push_back(cid);
             l_map[cid] = cif->follower;
+
+            std::cout << "Client " << cid << " was given a connection to cluster: " << serverID << std::endl;
 
             return Status::OK;
         }
@@ -217,6 +215,8 @@ class SNSCoordImpl final : public SNSCoord::Service
             f_map[f->id] = f;
 
             f->cif->follower = f;
+
+            std::cout << "A new Synchronizer with id " << f->id << " was created." << std::endl;
         }
         catch (const std::out_of_range& oor){
             std::cerr << "FollowerSpawn:\n";
@@ -242,12 +242,15 @@ void checkCluster(struct clustinfo *cif)
         //MASTER CHECK
         if (!cif->master_live && cif->mbeats > 0)
             cif->master_live = true; // ressurection
+            std::cout << "It would appear the master for cluster " << cif->print() << " has come back to life" << std::endl;
         if (mbeats - cif->mbeats > 2)
         { // if we miss 2 there's a failure
             // He's dead Jim...
             mbeats = 0;
             cif->mbeats = 0;
             cif->master_live = false;
+
+            std::cout << "It would appear the master for cluster " << cif->print() << " has died" << std::endl;
         }
         else if (cif->master_live)
         { // If we're alive, we need to add a beat
