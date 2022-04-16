@@ -72,6 +72,29 @@ int find_user(int username)
     return -1;
 }
 
+static void populate_following(int username, int userindex){
+    std::ifstream fol_f(std::to_string(username) + "follows.txt");
+    if(fol_f.good()){
+        std::string u_id="";
+        while(!fol_f.eof()) {
+            std::getline(fol_f, u_id, ',');
+            if (fol_f.fail()) break;
+            client_db[userindex].client_following.push_back(&client_db[find_user(atoi(u_id.c_str()))]);
+        }
+        fol_f.close();
+    }
+    std::ifstream flb_f(std::to_string(username) + "followedBy.txt");
+    if(flb_f.good()){
+        std::string u_id="";
+        while(!flb_f.eof()) {
+            std::getline(flb_f, u_id, ',');
+            if (flb_f.fail()) break;
+            client_db[userindex].client_followers.push_back(&client_db[find_user(atoi(u_id.c_str()))]);
+        }
+        flb_f.close();
+    }
+}
+
 //Helper login function to allow static calls
 static void login_help(const Request *request, Reply *reply){
     Client c;
@@ -82,6 +105,7 @@ static void login_help(const Request *request, Reply *reply){
         c.username = username;
         client_db.push_back(c);
         reply->set_msg("Login Successful!");
+        populate_following(username, user_index);
     }
     else
     {
@@ -135,29 +159,9 @@ class SNSServiceImpl final : public SNSService::Service
             user1->client_following.push_back(user2);
             user2->client_followers.push_back(user1);
             reply->set_msg("Follow Successful");
-        }
-        return Status::OK;
-    }
-
-    Status UnFollow(ServerContext *context, const Request *request, Reply *reply) override
-    {
-        int username1 = request->username();
-        int username2 = request->arguments(0);
-        int leave_index = find_user(username2);
-        if (leave_index < 0 || username1 == username2)
-            reply->set_msg("unknown follower username");
-        else
-        {
-            Client *user1 = &client_db[find_user(username1)];
-            Client *user2 = &client_db[leave_index];
-            if (std::find(user1->client_following.begin(), user1->client_following.end(), user2) == user1->client_following.end())
-            {
-                reply->set_msg("you are not follower");
-                return Status::OK;
-            }
-            user1->client_following.erase(find(user1->client_following.begin(), user1->client_following.end(), user2));
-            user2->client_followers.erase(find(user2->client_followers.begin(), user2->client_followers.end(), user1));
-            reply->set_msg("UnFollow Successful");
+            std::ofstream fol_s (std::to_string(username1) + "follows.txt", std::ios::app | std::ios::out | std::ios::in);
+            fol_s << username2 << ",";
+            fol_s.close();
         }
         return Status::OK;
     }

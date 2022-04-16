@@ -65,7 +65,6 @@ private:
     IReply Login();
     IReply List();
     IReply Follow(const int &username2);
-    IReply UnFollow(const int &username2);
     void Timeline(const int &username);
 };
 
@@ -169,10 +168,6 @@ IReply Client::processCommand(std::string &input)
         {
             return Follow(argument);
         }
-        else if (cmd == "UNFOLLOW")
-        {
-            return UnFollow(argument);
-        }
     }
     else
     {
@@ -262,40 +257,6 @@ IReply Client::Follow(const int &username2)
     {
         ire.comm_status = FAILURE_UNKNOWN;
     }
-    return ire;
-}
-
-IReply Client::UnFollow(const int &username2)
-{
-    Request request;
-
-    request.set_username(username);
-    request.add_arguments(username2);
-
-    Reply reply;
-
-    ClientContext context;
-
-    Status status = stub_->UnFollow(&context, request, &reply);
-    IReply ire;
-    ire.grpc_status = status;
-    if (reply.msg() == "unknown follower username")
-    {
-        ire.comm_status = FAILURE_INVALID_USERNAME;
-    }
-    else if (reply.msg() == "you are not follower")
-    {
-        ire.comm_status = FAILURE_INVALID_USERNAME;
-    }
-    else if (reply.msg() == "UnFollow Successful")
-    {
-        ire.comm_status = SUCCESS;
-    }
-    else
-    {
-        ire.comm_status = FAILURE_UNKNOWN;
-    }
-
     return ire;
 }
 

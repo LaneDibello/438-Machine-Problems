@@ -23,7 +23,7 @@ enum IStatus
  * declare a variable of IReply structure and set based on
  * the type of command and the result.
  *
- * - FOLLOW/UNFOLLOW/TIMELINE command:
+ * - FOLLOW/TIMELINE command:
  * IReply ireply;
  * ireply.grpc_status = return value of a service method
  * ireply.comm_status = one of values in IStatus enum
@@ -94,7 +94,6 @@ void IClient::displayTitle() const
     std::cout << "\n========= TINY SNS CLIENT =========\n";
     std::cout << " Command Lists and Format:\n";
     std::cout << " FOLLOW <username>\n";
-    std::cout << " UNFOLLOW <username>\n";
     std::cout << " LIST\n";
     std::cout << " TIMELINE\n";
     std::cout << "=====================================\n";

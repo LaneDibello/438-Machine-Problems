@@ -4,8 +4,10 @@
 #include <google/protobuf/duration.pb.h>
 
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <memory>
+#include <chrono>
 #include <string>
 #include <set>
 #include <stdlib.h>
@@ -43,15 +45,15 @@ std::set<int> client_ids;
 
 class SNSFollowerImpl final : public SNSFollower::Service{
     Status Following(ServerContext *context, const FollowPair* request, Blep* response) override {
-        int fid = request->fid();
-        if(client_ids.count(fid)){
-            std::ofstream fol_s (std::to_string(fid) + "following.txt", std::ios::app | std::ios::out | std::ios::in);
-            fol_s << request->id() << ",";
+        int id = request->id();
+        if(client_ids.count(id)){
+            std::ofstream fol_s (std::to_string(id) + "followedBy.txt", std::ios::app | std::ios::out | std::ios::in);
+            fol_s << request->fid() << ",";
             fol_s.close();
         }
         else{
             std::cerr << "Following:\n";
-            std::cerr << "Client with ID '" << fid << "' is not managed by this follower, ID: '" << f_id << "'\n";
+            std::cerr << "Client with ID '" << id << "' is not managed by this follower, ID: '" << f_id << "'\n";
             std::cerr << "Did the coordinator screw up?\n";
             return Status::CANCELLED;
         }
@@ -62,6 +64,26 @@ class SNSFollowerImpl final : public SNSFollower::Service{
         return Status::OK;
     }
 };
+
+//Check if uid follows anyone and then tell fid about it
+void checkFollowUpdates(int uid, int fid) {
+    std::filesystem::path p = std::to_string(uid)+"follows.txt";
+    int64_t last_write, now;
+    for(;;){
+        sleep(30);
+        last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
+        now = std::chrono::system_clock::now().time_since_epoch().count();
+        if (now - last_write < 30000000000){ //if there's been less than 30 seconds since last edit
+            //Figure out new follower(s)
+            //if we're fid update followedBy.txt
+            //otherwise RPC the update to fid
+        }
+    }
+}
+
+void checkTimelineUpdates(int uid){
+    //implement me!!!!
+}
 
 void printUsage(std::string arg = "")
 {
@@ -75,9 +97,21 @@ void printUsage(std::string arg = "")
     exit(1);
 }
 
+void RunServer(std::string port_no){
+    std::string server_address = "0.0.0.0:" + port_no;
+    SNSFollowerImpl service;
+
+    ServerBuilder builder;
+    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+    builder.RegisterService(&service);
+    std::unique_ptr<Server> server(builder.BuildAndStart());
+    std::cout << "Coordinator listening on " << server_address << std::endl;
+
+    server->Wait();
+}
+
 int main(int argc, char **argv)
 {
-
     if (argc != 9)
     {
         printUsage();
