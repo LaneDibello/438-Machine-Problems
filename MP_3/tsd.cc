@@ -4,6 +4,7 @@
 #include <google/protobuf/duration.pb.h>
 
 #include <fstream>
+#include <thread>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -63,6 +64,24 @@ std::string slave_addr;//likly uneeded for this implementation
 
 // Vector that stores every client that has been created
 std::vector<Client> client_db;
+
+void heartbeat() {
+    Status s;
+    for (;;){
+        HrtBt hb, rhb;
+        hb.set_id(s_id);
+        hb.set_master(isMaster);
+        ClientContext context;
+        std::cout << "Ba-";
+        s = c_stub->Gucci(&context, hb, &rhb);
+        if (!s.ok()) {
+            std::cout << "No heartbeat response... Is the coordinator alive?" << std::endl;
+            return;
+        }
+        std::cout << "bum" << std::endl;
+        sleep(10);
+    }
+}
 
 // Helper function used to find a Client object given its username
 int find_user(int username)
@@ -205,10 +224,11 @@ class SNSServiceImpl final : public SNSService::Service
                 std::copy(user2->client_followers.begin(), user2->client_followers.end(), fi2.mutable_followers()->begin());
 
                 Blep b1, b2;
-                ClientContext context;
+                ClientContext context1;
+                ClientContext context2;
 
-                s_stub->FollowUpdate(&context, fi1, &b1);
-                s_stub->FollowUpdate(&context, fi2, &b2);
+                s_stub->FollowUpdate(&context1, fi1, &b1);
+                s_stub->FollowUpdate(&context2, fi2, &b2);
             }
         }
         
@@ -386,16 +406,20 @@ void RunServer(std::string port_no)
         std::cerr << "Fatal error, server '" << s_id << "' failed to spawn cluster." << std::endl;
     }
     std::cout << "SUCCESS!" << std::endl;
+    std::cout << "Beginning heartbeat" << std::endl;
+    std::thread t(heartbeat);
+    t.detach();
     if (!si.master()){
         //SandMInform stub
         std::string s_login_info = si.addr() + ":" + si.port();
         s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
 
+        ClientContext context1;
         ServerIdent slave_id;
         slave_id.set_port(my_port);
         slave_id.set_addr("127.0.0.1"); //For this implementation the address will always be local! Change for multiple machining
         ServerIdent r_id;
-        s_stub->PokeMaster(&context, si, &r_id);
+        s_stub->PokeMaster(&context1, slave_id, &r_id);
     }
 
     ServerBuilder builder;

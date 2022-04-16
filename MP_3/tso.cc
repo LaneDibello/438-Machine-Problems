@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <stdexcept>
@@ -39,6 +40,8 @@ void checkCluster(struct clustinfo *);
 
 struct clustinfo
 {
+    std::mutex mtx;
+
     std::string master_addr = "";
     std::string master_port = "";
 
@@ -87,12 +90,14 @@ class SNSCoordImpl final : public SNSCoord::Service
         try
         { // If the obj already exists, then this is the slave
             cif = c_map.at(id);
+            cif->mtx.lock();
             cif->slave_addr = request->addr();
             cif->slave_port = request->port();
             cif->slave_live = true;
             response->set_addr(cif->master_addr);
             response->set_port(cif->master_port);
             response->set_master(false);
+            cif->mtx.unlock();
 
             std::cout << "Slave has arrived for " << id << std::endl;
         }
@@ -122,6 +127,7 @@ class SNSCoordImpl final : public SNSCoord::Service
         {
             struct clustinfo *cif = c_map.at(serverID);
             response->set_id(serverID);
+            cif->mtx.lock();
             if (cif->master_live)
             {
                 response->set_addr(cif->master_addr);
@@ -135,6 +141,8 @@ class SNSCoordImpl final : public SNSCoord::Service
 
             cif->follower->client_ids.push_back(cid);
             l_map[cid] = cif->follower;
+
+            cif->mtx.unlock();
 
             std::cout << "Client " << cid << " was given a connection to cluster: " << serverID << std::endl;
 
@@ -161,11 +169,13 @@ class SNSCoordImpl final : public SNSCoord::Service
         {
             // Try to find the cluster in the hash map
             struct clustinfo *cif = c_map.at(id);
+            cif->mtx.lock();
             // Increment the heatbeat clock for the respective process
             if (isMaster)
                 cif->mbeats++;
             else
                 cif->sbeats++;
+            cif->mtx.unlock();
         }
         catch (const std::out_of_range &oor)
         {
@@ -214,7 +224,9 @@ class SNSCoordImpl final : public SNSCoord::Service
 
             f_map[f->id] = f;
 
+            f->cif->mtx.lock();
             f->cif->follower = f;
+            f->cif->mtx.unlock();
 
             std::cout << "A new Synchronizer with id " << f->id << " was created." << std::endl;
         }
@@ -240,17 +252,20 @@ void checkCluster(struct clustinfo *cif)
         sleep(10); // Should be a beat every 10 sec
 
         //MASTER CHECK
+        cif->mtx.lock();
         if (!cif->master_live && cif->mbeats > 0)
+        {
             cif->master_live = true; // ressurection
-            std::cout << "It would appear the master for cluster " << cif->print() << " has come back to life" << std::endl;
-        if (mbeats - cif->mbeats > 2)
+            std::cout << "The master for cluster " << cif->print() << " is now alive" << std::endl;
+        }
+        if (mbeats > cif->mbeats + 1)
         { // if we miss 2 there's a failure
             // He's dead Jim...
             mbeats = 0;
             cif->mbeats = 0;
             cif->master_live = false;
 
-            std::cout << "It would appear the master for cluster " << cif->print() << " has died" << std::endl;
+            std::cout << "The master for cluster " << cif->print() << " has died" << std::endl;
         }
         else if (cif->master_live)
         { // If we're alive, we need to add a beat
@@ -260,7 +275,7 @@ void checkCluster(struct clustinfo *cif)
         //SLAVE CHECK
         if (!cif->slave_live && cif->sbeats > 0)
             cif->slave_live = true;
-        if (sbeats - cif->sbeats > 2)
+        if (sbeats > cif->sbeats + 1)
         {
             // He's dead Jim...
             sbeats = 0;
@@ -271,6 +286,7 @@ void checkCluster(struct clustinfo *cif)
         {
             sbeats++;
         }
+        cif->mtx.unlock();
     }
 }
 
