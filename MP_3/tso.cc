@@ -69,6 +69,7 @@ struct flwr
     struct clustinfo * cif = nullptr;
     std::vector<int> client_ids;
     int id; //back-up id
+    std::unique_ptr<csce438::SNSFollower::Stub> stub;
 };
 
 // Maps server IDs to clusters
@@ -80,41 +81,64 @@ std::map<int, struct flwr *> f_map;
 //Maps Client IDs to followers
 std::map<int, struct flwr *> l_map;
 
+//Tracks Registered Clients
+std::set<int> reg_c;
+
 class SNSCoordImpl final : public SNSCoord::Service
 {
     // server pings the coordinator with new cluster info
     Status ClusterSpawn(ServerContext *context, const ClusterInfo *request, ServerIdent *response) override
     {
         int id = request->id(); // Grab the server ID (used as a key for c_map)
+        bool isMaster = request->master();
         struct clustinfo *cif;
-        try
-        { // If the obj already exists, then this is the slave
-            cif = c_map.at(id);
-            cif->mtx.lock();
-            cif->slave_addr = request->addr();
-            cif->slave_port = request->port();
-            cif->slave_live = true;
-            response->set_addr(cif->master_addr);
-            response->set_port(cif->master_port);
-            response->set_master(false);
-            cif->mtx.unlock();
 
-            std::cout << "Slave has arrived for " << id << std::endl;
+        try{
+            cif = c_map.at(id);
         }
-        catch (const std::out_of_range &oor) // Otherwise, make a new obj for the master
-        {
+        catch (const std::out_of_range &oor) {
             cif = new clustinfo;
+            std::cout << "Spawning Cluster: " << id << std::endl;
+            c_map[id] = cif;
+        }
+        cif->mtx.lock();
+        if (isMaster){
+            if (cif->master_live) {
+                std::cerr << "Double master spawn for cluster " << id << std::endl;
+                cif->mtx.unlock();
+                return Status::CANCELLED;
+            }
             cif->master_addr = request->addr();
             cif->master_port = request->port();
             cif->master_live = true;
-            c_map[id] = cif;
 
-            std::cout << "Spawning Cluster: " << id << std::endl;
+            std::cout << "Master has arrived for " << id << std::endl;
 
             std::thread t(checkCluster, cif); // start waiting for heartbeat if it's the master
             t.detach();
+            if ( cif->slave_live) {
+                response->set_addr(cif->slave_addr);
+                response->set_port(cif->slave_port);
+            }
             response->set_master(true);
         }
+        else {
+            if (cif->slave_live) {
+                std::cerr << "Double slave spawn for cluster " << id << std::endl;
+                cif->mtx.unlock();
+                return Status::CANCELLED;
+            }
+            cif->slave_addr = request->addr();
+            cif->slave_port = request->port();
+            cif->slave_live = true;
+            if (cif->master_live){
+                response->set_addr(cif->master_addr);
+                response->set_port(cif->master_port);
+            }
+            response->set_master(false);
+            std::cout << "Slave has arrived for " << id << std::endl;
+        }
+        cif->mtx.unlock();
         
         return Status::OK;
     }
@@ -138,9 +162,26 @@ class SNSCoordImpl final : public SNSCoord::Service
                 response->set_addr(cif->slave_addr);
                 response->set_port(cif->slave_port);
             }
+            if (reg_c.count(cid)){
+                cif->mtx.unlock();
+                return Status::OK;
+            } 
 
-            cif->follower->client_ids.push_back(cid);
-            l_map[cid] = cif->follower;
+            if (cif->follower != nullptr){
+                cif->follower->client_ids.push_back(cid);
+                l_map[cid] = cif->follower;
+                ClientContext context;
+                JoinReq jr;
+                jr.set_id(cid);
+                Blep b;
+                cif->follower->stub->newClient(&context, jr, &b);
+                reg_c.insert(cid);
+            }
+            else {
+                std::cerr << "WARNING: cluster " << serverID << " doesn't have a sychronizer" << std::endl;
+                std::cerr << "All functionality may not be in place..." << std::endl;
+            }
+            
 
             cif->mtx.unlock();
 
@@ -221,6 +262,10 @@ class SNSCoordImpl final : public SNSCoord::Service
             f->addr = request->addr();
             f->port = request->port();
             f->cif = c_map.at(request->sid());
+
+            //make stub
+            std::string f_login_info = f->addr + ":" + f->port;
+            f->stub = std::unique_ptr<SNSFollower::Stub>(SNSFollower::NewStub(grpc::CreateChannel(f_login_info, grpc::InsecureChannelCredentials())));
 
             f_map[f->id] = f;
 

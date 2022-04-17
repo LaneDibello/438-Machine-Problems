@@ -103,7 +103,8 @@ constexpr ClusterInfo::ClusterInfo(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : addr_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , port_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , id_(0){}
+  , id_(0)
+  , master_(false){}
 struct ClusterInfoDefaultTypeInternal {
   constexpr ClusterInfoDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -258,6 +259,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_sns_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, addr_),
   PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, port_),
   PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, id_),
+  PROTOBUF_FIELD_OFFSET(::csce438::ClusterInfo, master_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::csce438::JoinReq, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -316,12 +318,12 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 30, -1, -1, sizeof(::csce438::Message)},
   { 39, -1, -1, sizeof(::csce438::FollowerInfo)},
   { 49, -1, -1, sizeof(::csce438::ClusterInfo)},
-  { 58, -1, -1, sizeof(::csce438::JoinReq)},
-  { 65, -1, -1, sizeof(::csce438::HrtBt)},
-  { 73, -1, -1, sizeof(::csce438::ServerIdent)},
-  { 82, -1, -1, sizeof(::csce438::FollowData)},
-  { 91, -1, -1, sizeof(::csce438::MsgChunk)},
-  { 99, -1, -1, sizeof(::csce438::FollowPair)},
+  { 59, -1, -1, sizeof(::csce438::JoinReq)},
+  { 66, -1, -1, sizeof(::csce438::HrtBt)},
+  { 74, -1, -1, sizeof(::csce438::ServerIdent)},
+  { 83, -1, -1, sizeof(::csce438::FollowData)},
+  { 92, -1, -1, sizeof(::csce438::MsgChunk)},
+  { 100, -1, -1, sizeof(::csce438::FollowPair)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -349,45 +351,45 @@ const char descriptor_table_protodef_sns_2eproto[] PROTOBUF_SECTION_VARIABLE(pro
   "Message\022\020\n\010username\030\001 \001(\005\022\013\n\003msg\030\002 \001(\t\022-"
   "\n\ttimestamp\030\003 \001(\0132\032.google.protobuf.Time"
   "stamp\"C\n\014FollowerInfo\022\014\n\004addr\030\001 \001(\t\022\014\n\004p"
-  "ort\030\002 \001(\t\022\n\n\002id\030\003 \001(\005\022\013\n\003sid\030\004 \001(\005\"5\n\013Cl"
+  "ort\030\002 \001(\t\022\n\n\002id\030\003 \001(\005\022\013\n\003sid\030\004 \001(\005\"E\n\013Cl"
   "usterInfo\022\014\n\004addr\030\001 \001(\t\022\014\n\004port\030\002 \001(\t\022\n\n"
-  "\002id\030\003 \001(\005\"\025\n\007JoinReq\022\n\n\002id\030\001 \001(\005\"#\n\005HrtB"
-  "t\022\n\n\002id\030\001 \001(\005\022\016\n\006master\030\002 \001(\010\"9\n\013ServerI"
-  "dent\022\016\n\006master\030\001 \001(\010\022\014\n\004port\030\002 \001(\t\022\014\n\004ad"
-  "dr\030\003 \001(\t\">\n\nFollowData\022\n\n\002id\030\001 \001(\005\022\021\n\tfo"
-  "llowing\030\002 \003(\005\022\021\n\tfollowers\030\003 \003(\005\"$\n\010MsgC"
-  "hunk\022\n\n\002id\030\001 \001(\005\022\014\n\004msgs\030\002 \003(\t\"%\n\nFollow"
-  "Pair\022\n\n\002id\030\001 \001(\005\022\013\n\003fid\030\002 \001(\0052\315\001\n\nSNSSer"
-  "vice\022+\n\005Login\022\020.csce438.Request\032\016.csce43"
-  "8.Reply\"\000\022.\n\004List\022\020.csce438.Request\032\022.cs"
-  "ce438.ListReply\"\000\022,\n\006Follow\022\020.csce438.Re"
-  "quest\032\016.csce438.Reply\"\000\0224\n\010Timeline\022\020.cs"
-  "ce438.Message\032\020.csce438.Message\"\000(\0010\0012\353\001"
-  "\n\016SNSSandMInform\022:\n\nPokeMaster\022\024.csce438"
-  ".ServerIdent\032\024.csce438.ServerIdent\"\000\0221\n\013"
-  "LoginUpdate\022\020.csce438.Request\032\016.csce438."
-  "Reply\"\000\0224\n\014FollowUpdate\022\023.csce438.Follow"
-  "Data\032\r.csce438.Blep\"\000\0224\n\016TimelineUpdate\022"
-  "\021.csce438.MsgChunk\032\r.csce438.Blep\"\0002\242\002\n\010"
-  "SNSCoord\022<\n\014ClusterSpawn\022\024.csce438.Clust"
-  "erInfo\032\024.csce438.ServerIdent\"\000\0227\n\rFollow"
-  "erSpawn\022\025.csce438.FollowerInfo\032\r.csce438"
-  ".Blep\"\000\0229\n\rGetConnection\022\020.csce438.JoinR"
-  "eq\032\024.csce438.ClusterInfo\"\000\0229\n\014GetFollowi"
-  "ng\022\020.csce438.JoinReq\032\025.csce438.FollowerI"
-  "nfo\"\000\022)\n\005Gucci\022\016.csce438.HrtBt\032\016.csce438"
-  ".HrtBt\"\0002\242\001\n\013SNSFollower\0221\n\tFollowing\022\023."
-  "csce438.FollowPair\032\r.csce438.Blep\"\000\0220\n\nn"
-  "ewMessage\022\021.csce438.MsgChunk\032\r.csce438.B"
-  "lep\"\000\022.\n\tnewClient\022\020.csce438.JoinReq\032\r.c"
-  "sce438.Blep\"\000b\006proto3"
+  "\002id\030\003 \001(\005\022\016\n\006master\030\004 \001(\010\"\025\n\007JoinReq\022\n\n\002"
+  "id\030\001 \001(\005\"#\n\005HrtBt\022\n\n\002id\030\001 \001(\005\022\016\n\006master\030"
+  "\002 \001(\010\"9\n\013ServerIdent\022\016\n\006master\030\001 \001(\010\022\014\n\004"
+  "port\030\002 \001(\t\022\014\n\004addr\030\003 \001(\t\">\n\nFollowData\022\n"
+  "\n\002id\030\001 \001(\005\022\021\n\tfollowing\030\002 \003(\005\022\021\n\tfollowe"
+  "rs\030\003 \003(\005\"$\n\010MsgChunk\022\n\n\002id\030\001 \001(\005\022\014\n\004msgs"
+  "\030\002 \003(\t\"%\n\nFollowPair\022\n\n\002id\030\001 \001(\005\022\013\n\003fid\030"
+  "\002 \001(\0052\315\001\n\nSNSService\022+\n\005Login\022\020.csce438."
+  "Request\032\016.csce438.Reply\"\000\022.\n\004List\022\020.csce"
+  "438.Request\032\022.csce438.ListReply\"\000\022,\n\006Fol"
+  "low\022\020.csce438.Request\032\016.csce438.Reply\"\000\022"
+  "4\n\010Timeline\022\020.csce438.Message\032\020.csce438."
+  "Message\"\000(\0010\0012\353\001\n\016SNSSandMInform\022:\n\nPoke"
+  "Master\022\024.csce438.ServerIdent\032\024.csce438.S"
+  "erverIdent\"\000\0221\n\013LoginUpdate\022\020.csce438.Re"
+  "quest\032\016.csce438.Reply\"\000\0224\n\014FollowUpdate\022"
+  "\023.csce438.FollowData\032\r.csce438.Blep\"\000\0224\n"
+  "\016TimelineUpdate\022\021.csce438.MsgChunk\032\r.csc"
+  "e438.Blep\"\0002\242\002\n\010SNSCoord\022<\n\014ClusterSpawn"
+  "\022\024.csce438.ClusterInfo\032\024.csce438.ServerI"
+  "dent\"\000\0227\n\rFollowerSpawn\022\025.csce438.Follow"
+  "erInfo\032\r.csce438.Blep\"\000\0229\n\rGetConnection"
+  "\022\020.csce438.JoinReq\032\024.csce438.ClusterInfo"
+  "\"\000\0229\n\014GetFollowing\022\020.csce438.JoinReq\032\025.c"
+  "sce438.FollowerInfo\"\000\022)\n\005Gucci\022\016.csce438"
+  ".HrtBt\032\016.csce438.HrtBt\"\0002\242\001\n\013SNSFollower"
+  "\0221\n\tFollowing\022\023.csce438.FollowPair\032\r.csc"
+  "e438.Blep\"\000\0220\n\nnewMessage\022\021.csce438.MsgC"
+  "hunk\032\r.csce438.Blep\"\000\022.\n\tnewClient\022\020.csc"
+  "e438.JoinReq\032\r.csce438.Blep\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_sns_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sns_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto = {
-  false, false, 1581, descriptor_table_protodef_sns_2eproto, "sns.proto", 
+  false, false, 1597, descriptor_table_protodef_sns_2eproto, "sns.proto", 
   &descriptor_table_sns_2eproto_once, descriptor_table_sns_2eproto_deps, 1, 13,
   schemas, file_default_instances, TableStruct_sns_2eproto::offsets,
   file_level_metadata_sns_2eproto, file_level_enum_descriptors_sns_2eproto, file_level_service_descriptors_sns_2eproto,
@@ -1831,14 +1833,19 @@ ClusterInfo::ClusterInfo(const ClusterInfo& from)
     port_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_port(), 
       GetArenaForAllocation());
   }
-  id_ = from.id_;
+  ::memcpy(&id_, &from.id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&master_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(master_));
   // @@protoc_insertion_point(copy_constructor:csce438.ClusterInfo)
 }
 
 void ClusterInfo::SharedCtor() {
 addr_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 port_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-id_ = 0;
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&id_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&master_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(master_));
 }
 
 ClusterInfo::~ClusterInfo() {
@@ -1872,7 +1879,9 @@ void ClusterInfo::Clear() {
 
   addr_.ClearToEmpty();
   port_.ClearToEmpty();
-  id_ = 0;
+  ::memset(&id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&master_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(master_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1906,6 +1915,14 @@ const char* ClusterInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool master = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+          master_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1965,6 +1982,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_id(), target);
   }
 
+  // bool master = 4;
+  if (this->_internal_master() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(4, this->_internal_master(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2000,6 +2023,11 @@ size_t ClusterInfo::ByteSizeLong() const {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32SizePlusOne(this->_internal_id());
   }
 
+  // bool master = 4;
+  if (this->_internal_master() != 0) {
+    total_size += 1 + 1;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
@@ -2031,6 +2059,9 @@ void ClusterInfo::MergeFrom(const ClusterInfo& from) {
   if (from._internal_id() != 0) {
     _internal_set_id(from._internal_id());
   }
+  if (from._internal_master() != 0) {
+    _internal_set_master(from._internal_master());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -2060,7 +2091,12 @@ void ClusterInfo::InternalSwap(ClusterInfo* other) {
       &port_, lhs_arena,
       &other->port_, rhs_arena
   );
-  swap(id_, other->id_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ClusterInfo, master_)
+      + sizeof(ClusterInfo::master_)
+      - PROTOBUF_FIELD_OFFSET(ClusterInfo, id_)>(
+          reinterpret_cast<char*>(&id_),
+          reinterpret_cast<char*>(&other->id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ClusterInfo::GetMetadata() const {

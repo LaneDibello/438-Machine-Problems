@@ -129,6 +129,7 @@ static void login_help(const Request *request, Reply *reply){
         c.username = username;
         client_db.push_back(c);
         reply->set_msg("Login Successful!");
+        user_index = find_user(username);
         populate_following(username, user_index);
     }
     else
@@ -168,6 +169,7 @@ class SNSServiceImpl final : public SNSService::Service
     {
         int username1 = request->username();
         int toFollow = request->arguments(0);
+        std::cout << username1 << " is attempting to follow " << toFollow << std::endl;
         int join_index = find_user(toFollow);
         if (join_index < 0 && username1 != toFollow){
             Client *user1 = &client_db[find_user(username1)];
@@ -331,7 +333,7 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
         std::string s_login_info = slave_addr + ":" + slave_port;
         s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
 
-        std::cout << "Slave process has made contact" << std::endl;
+        std::cout << "Sibling process has made contact" << std::endl;
 
         return Status::OK;
     }
@@ -399,6 +401,7 @@ void RunServer(std::string port_no)
     ci.set_addr("127.0.0.1"); //Later get own hostname!!!
     ci.set_port(port_no);
     ci.set_id(s_id);
+    ci.set_master(isMaster);
     ServerIdent si;
     std::cout << "Attempting to spawn cluster..." << std::endl;
     s = c_stub->ClusterSpawn(&context, ci, &si);
@@ -409,17 +412,17 @@ void RunServer(std::string port_no)
     std::cout << "Beginning heartbeat" << std::endl;
     std::thread t(heartbeat);
     t.detach();
-    if (!si.master()){
+    if (si.addr() != ""){
         //SandMInform stub
         std::string s_login_info = si.addr() + ":" + si.port();
         s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
 
         ClientContext context1;
-        ServerIdent slave_id;
-        slave_id.set_port(my_port);
-        slave_id.set_addr("127.0.0.1"); //For this implementation the address will always be local! Change for multiple machining
+        ServerIdent sib_id;
+        sib_id.set_port(my_port);
+        sib_id.set_addr("127.0.0.1"); //For this implementation the address will always be local! Change for multiple machining
         ServerIdent r_id;
-        s_stub->PokeMaster(&context1, slave_id, &r_id);
+        s_stub->PokeMaster(&context1, sib_id, &r_id);
     }
 
     ServerBuilder builder;

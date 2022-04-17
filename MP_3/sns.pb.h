@@ -1242,6 +1242,7 @@ class ClusterInfo final :
     kAddrFieldNumber = 1,
     kPortFieldNumber = 2,
     kIdFieldNumber = 3,
+    kMasterFieldNumber = 4,
   };
   // string addr = 1;
   void clear_addr();
@@ -1280,6 +1281,15 @@ class ClusterInfo final :
   void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // bool master = 4;
+  void clear_master();
+  bool master() const;
+  void set_master(bool value);
+  private:
+  bool _internal_master() const;
+  void _internal_set_master(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:csce438.ClusterInfo)
  private:
   class _Internal;
@@ -1290,6 +1300,7 @@ class ClusterInfo final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr addr_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr port_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  bool master_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sns_2eproto;
 };
@@ -2937,6 +2948,26 @@ inline void ClusterInfo::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) 
 inline void ClusterInfo::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:csce438.ClusterInfo.id)
+}
+
+// bool master = 4;
+inline void ClusterInfo::clear_master() {
+  master_ = false;
+}
+inline bool ClusterInfo::_internal_master() const {
+  return master_;
+}
+inline bool ClusterInfo::master() const {
+  // @@protoc_insertion_point(field_get:csce438.ClusterInfo.master)
+  return _internal_master();
+}
+inline void ClusterInfo::_internal_set_master(bool value) {
+  
+  master_ = value;
+}
+inline void ClusterInfo::set_master(bool value) {
+  _internal_set_master(value);
+  // @@protoc_insertion_point(field_set:csce438.ClusterInfo.master)
 }
 
 // -------------------------------------------------------------------

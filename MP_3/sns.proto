@@ -81,6 +81,8 @@ message ClusterInfo {
   string port = 2;
   //The the server ID of this cluster
   int32 id = 3;
+  //Is the sender the master
+  bool master = 4;
 }
 
 //Signifys that a user of this ID wants to join a cluster

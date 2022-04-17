@@ -5,11 +5,12 @@
 
 #include <fstream>
 #include <algorithm>
-#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <iterator>
 #include <string>
 #include <stack>
@@ -80,7 +81,7 @@ class SNSFollowerImpl final : public SNSFollower::Service{
             return Status::OK;
         }
         else {
-            std::cout << "The new client" << id << "already existed" << std::endl;
+            std::cout << "The new client " << id << " already existed" << std::endl;
             return Status::CANCELLED;
         }
         
@@ -107,20 +108,33 @@ class SNSFollowerImpl final : public SNSFollower::Service{
 void checkFollowUpdates(int uid) {
     std::set<int> following;
     std::ifstream ifs(std::to_string(uid)+"follows.txt");
+    if (ifs.fail()){
+        std::cout << uid << " doesn't yet have a 'follows.txt'. Creating one..." << std::endl;
+            std::ofstream ofs(std::to_string(uid)+"follows.txt");
+            ofs.close();
+    }
     std::string u = "";
     while(ifs.good()){
         std::getline(ifs, u, ',');
         following.insert(atoi(u.c_str()));
     }
-    
-    std::filesystem::path p = std::to_string(uid)+"follows.txt";
-    int64_t last_write, now;
+    ifs.close();
+
     for(;;){
         sleep(30);
-        last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
-        now = std::chrono::system_clock::now().time_since_epoch().count();
-        if (now - last_write < 30000000000){ //if there's been less than 30 seconds since last edit
-            std::cout << "An follower update was detected for " << uid << std::endl;
+        struct stat statbuf;
+        if(stat((std::to_string(uid)+"follows.txt").c_str(), &statbuf)!=0){
+            std::cerr << "Stat failed to find follows info for " << uid << std::endl;
+            perror("stat");
+            continue;
+        }
+        time_t last_write = statbuf.st_mtim.tv_sec;
+        time_t now = time(nullptr);
+        double difft = std::difftime(now, last_write);
+        std::cout << difft << " seconds have passed since " << std::to_string(uid)+"follows.txt was last edited" << std::endl;
+
+        if (difft < 30){ //if there's been less than 30 seconds since last edit
+            std::cout << "A follower update was detected for " << uid << std::endl;
             //Figure out new follower(s)
             std::set<int> fol;
             std::ifstream ifs(std::to_string(uid)+"follows.txt");
@@ -129,9 +143,18 @@ void checkFollowUpdates(int uid) {
                 std::getline(ifs, u, ',');
                 fol.insert(atoi(u.c_str()));
             }
+            if (fol.empty()){
+                std::cout << "False alarm, no follows found for " << uid << std::endl;
+                continue;
+            }
             std::set<int> diff;
-            std::set_difference (following.begin(), following.end(), fol.begin(), fol.end(), std::inserter(diff, diff.end()));
+            std::set_difference (fol.begin(), fol.end(), following.begin(), following.end(), std::inserter(diff, diff.end()));
             
+            if (diff.empty()){
+                std::cerr << "No new follows were found for " << uid << std::endl;
+                continue;
+            }
+
             //Update the following set
             following.clear();
             std::copy(fol.begin(), fol.end(), std::inserter(following, following.end()));
@@ -152,7 +175,10 @@ void checkFollowUpdates(int uid) {
                     jr.set_id(i);
 
                     Status status = c_stub->GetFollowing(&context, jr, &ci);
-                    if (!status.ok()) continue;
+                    if (!status.ok()){
+                        std::cerr << "The coordinator did not return info for " << i << "'s synchronizer" << std::endl;
+                        continue;
+                    }
                     
                     std::cout << "Notifying follower " << ci.id() << " that " << i << " is followed by " << uid << std::endl;
 
@@ -162,11 +188,12 @@ void checkFollowUpdates(int uid) {
 
                     FollowPair fp;
                     Blep b;
+                    ClientContext context1;
 
                     fp.set_id(uid); //uid follows i
                     fp.set_fid(i);
 
-                    status = f_stub->Following(&context, fp, &b);
+                    status = f_stub->Following(&context1, fp, &b);
                 }
             }
         }
@@ -175,14 +202,28 @@ void checkFollowUpdates(int uid) {
 
 //Check if uid updates their timeline, and notify the others
 void checkTimelineUpdates(int uid){
-    //implement me!!!!
-    std::filesystem::path p = std::to_string(uid)+"timeline.txt";
-    int64_t last_write, now;
+    std::ifstream ifs(std::to_string(uid)+"timeline.txt");
+    if (ifs.fail()){
+        std::cout << uid << " doesn't yet have a 'timeline.txt'. Creating one..." << std::endl;
+            std::ofstream ofs(std::to_string(uid)+"timeline.txt");
+            ofs.close();
+    }
+    ifs.close();
+
     for(;;){
         sleep(30);
-        last_write = std::filesystem::last_write_time(p).time_since_epoch().count();
-        now = std::chrono::system_clock::now().time_since_epoch().count();
-        if (now - last_write < 30000000000){
+        struct stat statbuf;
+        if(stat((std::to_string(uid)+"timeline.txt").c_str(), &statbuf)!=0){
+            std::cerr << "Stat failed to find timeline info for " << uid << std::endl;
+            perror("stat");
+            continue;
+        }
+        time_t last_write = statbuf.st_mtim.tv_sec;
+        time_t now = time(nullptr);
+        double difft = std::difftime(now, last_write);
+        std::cout << difft << "seconds have passed since " << std::to_string(uid)+"timeline.txt was last edited" << std::endl;
+        
+        if (difft < 30){
             std::cout << "An update was found in " << uid << "'s timeline." << std::endl;
             //Grab the posts
             std::ifstream ifs(std::to_string(uid)+"timeline.txt");
@@ -194,6 +235,11 @@ void checkTimelineUpdates(int uid){
                 posts.push(p);
             }
             ifs.close();
+
+            if (posts.empty()){
+                std::cout << "No posts found for " << uid << std::endl;
+                continue;
+            }
 
             //Build the MsgChunk
             MsgChunk mc;
@@ -344,6 +390,13 @@ int main(int argc, char **argv)
             }
             i++;
         }
+    }
+
+    if(f_id < 0) {
+        printUsage("-id");
+    }
+    else{
+        s_id = f_id;
     }
 
     RunServer(port);

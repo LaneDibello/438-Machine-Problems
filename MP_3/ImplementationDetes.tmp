@@ -5,7 +5,12 @@ User files (stored with server):
     <uid>fTimelines.txt - A conglomerate of the timelines of users they follow
 
 TODO:
+Add getaddrinfo implementation so this works on multi machine
+    Right now several "127.0.0.1"s are hardcoded for testing
 Put some mutexes in place for thread safety
+LIST all users, does not get synchronized
+client_db should really be map
+    would affect find_user, populate following, others...
 
 
 Usages:
