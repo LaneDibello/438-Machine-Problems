@@ -8,6 +8,8 @@
 #include <iostream>
 #include <stack>
 #include <sstream>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -123,6 +125,65 @@ static void populate_following(int username, int userindex){
             client_db[userindex].client_followers.push_back(atoi(u_id.c_str()));
         }
         flb_f.close();
+    }
+}
+
+Message parseMessage(std::string p){
+    Message msg_l;
+    std::string p_un = "";
+    std::string p_text = "";
+    std::string p_time = "";
+
+    std::istringstream msg_chunk(p.substr(24));
+    std::getline(msg_chunk, p_un, ':');
+    std::getline(msg_chunk, p_text);
+
+    msg_l.set_username(atoi(p_un.c_str()));
+    msg_l.set_msg(p_text);
+    google::protobuf::Timestamp *ts = new google::protobuf::Timestamp();
+    
+    struct tm tm;
+    char buf[255];
+    memset(&tm, 0, sizeof(tm));
+    strptime(p_time.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm);
+    time_t stamp = mktime(&tm);
+
+    ts->set_seconds(stamp);
+    ts->set_nanos(0);
+    msg_l.set_allocated_timestamp(ts);
+
+    return msg_l;
+}
+
+void catchTimlineUpdates(int id, ServerReaderWriter<Message, Message> *stream, std::streampos off){
+    //std::ifstream ifs(std::to_string(id) + "fTimelines.txt");
+    for (;;)
+    {
+        struct stat statbuf;
+        if(stat((std::to_string(id)+"fTimelines.txt").c_str(), &statbuf)!=0){
+            std::cerr << "Stat failed to find fTimelines info for " << id << std::endl;
+            perror("stat");
+        }
+        time_t last_write = statbuf.st_mtim.tv_sec;
+        time_t now = time(nullptr);
+        double difft = std::difftime(now, last_write);
+        if (difft < 1){
+            //Do Stuff
+            std::ifstream ifs(std::to_string(id) + "fTimelines.txt");
+            ifs.seekg(off);
+            std::string p;
+            while (ifs.good()){
+                std::getline(ifs, p);
+                if (p == "") continue;
+                Message m = parseMessage(p);
+                if (!stream->Write(m)){
+                    std::cerr << "Bad write for catchTimeLineUpdates for " << id << std::endl;
+                }
+            }
+            off = ifs.tellg();
+            ifs.close();
+        }
+        sleep(1);
     }
 }
 
@@ -282,6 +343,10 @@ class SNSServiceImpl final : public SNSService::Service
                 std::cout << username << " has open timeline" << std::endl;
                 std::stack<Message> msg_stack;
                 std::ifstream ifs(std::to_string(username) + "fTimelines.txt");
+                if (!ifs.good()){
+                    std::ofstream make_file(std::to_string(username) + "fTimelines.txt", std::fstream::app);
+                    make_file.close();
+                }
                 std::string p = "";
                 std::string p_un = "";
                 std::string p_text = "";
@@ -290,24 +355,8 @@ class SNSServiceImpl final : public SNSService::Service
                     std::getline(ifs, p);
                     if (p == "") continue;
                     p_time = p.substr(0, 20);
-                    std::istringstream msg_chunk(p.substr(24));
-                    std::getline(msg_chunk, p_un, ':');
-                    std::getline(msg_chunk, p_text);
 
-                    Message msg_l;
-                    msg_l.set_username(atoi(p_un.c_str()));
-                    msg_l.set_msg(p_text);
-                    google::protobuf::Timestamp *ts = new google::protobuf::Timestamp();
-                    
-                    struct tm tm;
-                    char buf[255];
-                    memset(&tm, 0, sizeof(tm));
-                    strptime(p_time.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm);
-                    time_t stamp = mktime(&tm);
-
-                    ts->set_seconds(stamp);
-                    ts->set_nanos(0);
-                    msg_l.set_allocated_timestamp(ts);
+                    Message msg_l = parseMessage(p);
 
                     msg_stack.push(msg_l);
                 }
@@ -319,6 +368,8 @@ class SNSServiceImpl final : public SNSService::Service
                     msg_stack.pop();
                 }
                 first_time = false;
+                std::thread t(catchTimlineUpdates, username, stream, ifs.tellg());
+                t.detach();
             }
 
             // Write the current message to "usernametimeline.txt"
@@ -331,36 +382,7 @@ class SNSServiceImpl final : public SNSService::Service
             if (message.msg() != "Set Stream")
                 user_file << fileinput;
             // If message = "Set Stream", print the first 20 chats from the people you follow
-            else
-            {
-                if (c->stream == 0)
-                    c->stream = stream;
-                std::string line;
-                std::vector<std::string> newest_twenty;
-                std::ifstream in(std::to_string(username) + "fTimelines.txt");
-                int count = 0;
-                // Read the last up-to-20 lines (newest 20 messages) from userfTimelines.txt
-                while (getline(in, line))
-                {
-                    if (c->following_file_size > 20)
-                    {
-                        if (count < c->following_file_size - 20)
-                        {
-                            count++;
-                            continue;
-                        }
-                    }
-                    newest_twenty.push_back(line);
-                }
-                Message new_msg;
-                // Send the newest messages to the client to be displayed
-                for (int i = 0; i < newest_twenty.size(); i++)
-                {
-                    new_msg.set_msg(newest_twenty[i]);
-                    stream->Write(new_msg);
-                }
-                continue;
-            }
+            
             // Send the message to each follower's stream
             std::vector<int>::const_iterator it;
             for (it = c->client_followers.begin(); it != c->client_followers.end(); it++)

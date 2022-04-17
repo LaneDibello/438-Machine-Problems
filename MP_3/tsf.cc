@@ -102,7 +102,7 @@ class SNSFollowerImpl final : public SNSFollower::Service{
             return Status::CANCELLED;
         }
         //distribute the new messages to the follower
-        std::ofstream ofs(std::to_string(recv_id) + "fTimlines.txt", std::ios::app | std::ios::out | std::ios::in);
+        std::ofstream ofs(std::to_string(recv_id) + "fTimelines.txt", std::ios::app | std::ios::out | std::ios::in);
         for (auto msg : request->msgs()){
             ofs << msg << std::endl;
         }
