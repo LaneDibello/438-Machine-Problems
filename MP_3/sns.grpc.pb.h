@@ -1403,6 +1403,13 @@ class SNSCoord final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>> PrepareAsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>>(PrepareAsyncGucciRaw(context, request, cq));
     }
+    virtual ::grpc::Status GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::csce438::AllUsers* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>> AsyncGetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>>(AsyncGetAllUsersRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>> PrepareAsyncGetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>>(PrepareAsyncGetAllUsersRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -1416,6 +1423,8 @@ class SNSCoord final {
       virtual void GetFollowing(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -1431,6 +1440,8 @@ class SNSCoord final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::FollowerInfo>* PrepareAsyncGetFollowingRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>* AsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::HrtBt>* PrepareAsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>* AsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::AllUsers>* PrepareAsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -1470,6 +1481,13 @@ class SNSCoord final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>> PrepareAsyncGucci(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>>(PrepareAsyncGucciRaw(context, request, cq));
     }
+    ::grpc::Status GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::csce438::AllUsers* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>> AsyncGetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>>(AsyncGetAllUsersRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>> PrepareAsyncGetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>>(PrepareAsyncGetAllUsersRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -1483,6 +1501,8 @@ class SNSCoord final {
       void GetFollowing(::grpc::ClientContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, std::function<void(::grpc::Status)>) override;
       void Gucci(::grpc::ClientContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, std::function<void(::grpc::Status)>) override;
+      void GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -1504,11 +1524,14 @@ class SNSCoord final {
     ::grpc::ClientAsyncResponseReader< ::csce438::FollowerInfo>* PrepareAsyncGetFollowingRaw(::grpc::ClientContext* context, const ::csce438::JoinReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* AsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::csce438::HrtBt>* PrepareAsyncGucciRaw(::grpc::ClientContext* context, const ::csce438::HrtBt& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>* AsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>* PrepareAsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_ClusterSpawn_;
     const ::grpc::internal::RpcMethod rpcmethod_FollowerSpawn_;
     const ::grpc::internal::RpcMethod rpcmethod_GetConnection_;
     const ::grpc::internal::RpcMethod rpcmethod_GetFollowing_;
     const ::grpc::internal::RpcMethod rpcmethod_Gucci_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetAllUsers_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -1521,6 +1544,7 @@ class SNSCoord final {
     virtual ::grpc::Status GetConnection(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::ClusterInfo* response);
     virtual ::grpc::Status GetFollowing(::grpc::ServerContext* context, const ::csce438::JoinReq* request, ::csce438::FollowerInfo* response);
     virtual ::grpc::Status Gucci(::grpc::ServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response);
+    virtual ::grpc::Status GetAllUsers(::grpc::ServerContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_ClusterSpawn : public BaseClass {
@@ -1622,7 +1646,27 @@ class SNSCoord final {
       ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_ClusterSpawn<WithAsyncMethod_FollowerSpawn<WithAsyncMethod_GetConnection<WithAsyncMethod_GetFollowing<WithAsyncMethod_Gucci<Service > > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetAllUsers(::grpc::ServerContext* context, ::csce438::Blep* request, ::grpc::ServerAsyncResponseWriter< ::csce438::AllUsers>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_ClusterSpawn<WithAsyncMethod_FollowerSpawn<WithAsyncMethod_GetConnection<WithAsyncMethod_GetFollowing<WithAsyncMethod_Gucci<WithAsyncMethod_GetAllUsers<Service > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_ClusterSpawn : public BaseClass {
    private:
@@ -1758,7 +1802,34 @@ class SNSCoord final {
     virtual ::grpc::ServerUnaryReactor* Gucci(
       ::grpc::CallbackServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_ClusterSpawn<WithCallbackMethod_FollowerSpawn<WithCallbackMethod_GetConnection<WithCallbackMethod_GetFollowing<WithCallbackMethod_Gucci<Service > > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::Blep, ::csce438::AllUsers>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response) { return this->GetAllUsers(context, request, response); }));}
+    void SetMessageAllocatorFor_GetAllUsers(
+        ::grpc::MessageAllocator< ::csce438::Blep, ::csce438::AllUsers>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::Blep, ::csce438::AllUsers>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* GetAllUsers(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_ClusterSpawn<WithCallbackMethod_FollowerSpawn<WithCallbackMethod_GetConnection<WithCallbackMethod_GetFollowing<WithCallbackMethod_Gucci<WithCallbackMethod_GetAllUsers<Service > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_ClusterSpawn : public BaseClass {
@@ -1841,6 +1912,23 @@ class SNSCoord final {
     }
     // disable synchronous version of this method
     ::grpc::Status Gucci(::grpc::ServerContext* /*context*/, const ::csce438::HrtBt* /*request*/, ::csce438::HrtBt* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1943,6 +2031,26 @@ class SNSCoord final {
     }
     void RequestGucci(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetAllUsers(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2053,6 +2161,28 @@ class SNSCoord final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* Gucci(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->GetAllUsers(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* GetAllUsers(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -2190,9 +2320,36 @@ class SNSCoord final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGucci(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::HrtBt,::csce438::HrtBt>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_FollowerSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_GetFollowing<WithStreamedUnaryMethod_Gucci<Service > > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetAllUsers : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_GetAllUsers() {
+      ::grpc::Service::MarkMethodStreamed(5,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::csce438::Blep, ::csce438::AllUsers>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::csce438::Blep, ::csce438::AllUsers>* streamer) {
+                       return this->StreamedGetAllUsers(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_GetAllUsers() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetAllUsers(::grpc::ServerContext* /*context*/, const ::csce438::Blep* /*request*/, ::csce438::AllUsers* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetAllUsers(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::Blep,::csce438::AllUsers>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_FollowerSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_GetFollowing<WithStreamedUnaryMethod_Gucci<WithStreamedUnaryMethod_GetAllUsers<Service > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_FollowerSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_GetFollowing<WithStreamedUnaryMethod_Gucci<Service > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_ClusterSpawn<WithStreamedUnaryMethod_FollowerSpawn<WithStreamedUnaryMethod_GetConnection<WithStreamedUnaryMethod_GetFollowing<WithStreamedUnaryMethod_Gucci<WithStreamedUnaryMethod_GetAllUsers<Service > > > > > > StreamedService;
 };
 
 class SNSFollower final {

@@ -8,6 +8,10 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <chrono>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -47,6 +51,7 @@ std::string c_port;
 int f_id;
 int s_id;
 std::set<int> client_ids;
+std::string my_hostname;
 
 //Stub
 std::unique_ptr<csce438::SNSCoord::Stub> c_stub;
@@ -57,14 +62,16 @@ void checkTimelineUpdates(int);
 class SNSFollowerImpl final : public SNSFollower::Service{
     Status Following(ServerContext *context, const FollowPair* request, Blep* response) override {
         int id = request->id();
-        if(client_ids.count(id)){
-            std::ofstream fol_s (std::to_string(id) + "followedBy.txt", std::ios::app | std::ios::out | std::ios::in);
-            fol_s << request->fid() << ",";
+        int fid = request->fid();
+        if(client_ids.count(fid)){
+            std::ofstream fol_s (std::to_string(fid) + "followedBy.txt", std::ios::app | std::ios::out | std::ios::in);
+            fol_s << id << ",";
             fol_s.close();
+            std::cout << fid << " is followed by " << id << std::endl;
         }
         else{
             std::cerr << "Following:\n";
-            std::cerr << "Client with ID '" << id << "' is not managed by this follower, ID: '" << f_id << "'\n";
+            std::cerr << "Client with ID '" << fid << "' is not managed by this follower, ID: '" << f_id << "'\n";
             std::cerr << "Did the coordinator screw up?\n";
             return Status::CANCELLED;
         }
@@ -116,9 +123,11 @@ void checkFollowUpdates(int uid) {
     std::string u = "";
     while(ifs.good()){
         std::getline(ifs, u, ',');
+        if (u == "") continue;
         following.insert(atoi(u.c_str()));
     }
     ifs.close();
+    sleep(1); //Dirty trick to keep the file creation from breaking things
 
     for(;;){
         sleep(30);
@@ -141,6 +150,7 @@ void checkFollowUpdates(int uid) {
             u = "";
             while(ifs.good()){
                 std::getline(ifs, u, ',');
+                if (u == "") continue;
                 fol.insert(atoi(u.c_str()));
             }
             if (fol.empty()){
@@ -209,6 +219,7 @@ void checkTimelineUpdates(int uid){
             ofs.close();
     }
     ifs.close();
+    sleep(1); //Dirty trick to keep the file creation from breaking things
 
     for(;;){
         sleep(30);
@@ -243,8 +254,9 @@ void checkTimelineUpdates(int uid){
 
             //Build the MsgChunk
             MsgChunk mc;
+            int msgcount = 0;
             //mc.set_id(uid);
-            for (;;){ //we want most recent messages
+            while (!posts.empty()){ //we want most recent messages
                 //Time comparsion
                 std::string timestamp = posts.top().substr(0, 20);
                 char nowbuf[100];
@@ -256,6 +268,7 @@ void checkTimelineUpdates(int uid){
                 strftime(nowbuf, sizeof(nowbuf), "%Y-%m-%dT%H:%M:%SZ", nowtm);
                 if (strncmp(timestamp.c_str(), nowbuf, timestamp.length()) >= 0){
                     mc.add_msgs(posts.top());
+                    msgcount++;
                 }
                 posts.pop();
             }
@@ -266,13 +279,16 @@ void checkTimelineUpdates(int uid){
             std::string u = "";
             while(ifs.good()){
                 std::getline(ifs1, u, ',');
+                if(u == "") continue;
                 followers.push_back(atoi(u.c_str()));
             }
             ifs1.close();
 
+            std::cout << "Broadcasting " << msgcount << " messages to " << followers.size() << " followers." << std::endl;
+
             //Broadcast our messages
-            ClientContext context;
             for (int f : followers){
+                ClientContext context;
                 std::cout << "Informing follower " << f << " about client " << uid << "'s update." << std::endl;
                 //Who does this belong to?
                 JoinReq jr;
@@ -317,7 +333,7 @@ void RunServer(std::string port_no){
     //Spawn Follower for Coordinator
     ClientContext context;
     FollowerInfo fi;
-    fi.set_addr("127.0.0.1"); //TEMPORARY, use a getaddrinfo later
+    fi.set_addr(my_hostname); 
     fi.set_port(port_no);
     fi.set_id(f_id);
     fi.set_sid(s_id);
@@ -398,6 +414,12 @@ int main(int argc, char **argv)
     else{
         s_id = f_id;
     }
+
+    char hostbuff[32];
+    int host = gethostname(hostbuff, 32);
+    struct hostent *host_entry = gethostbyname(hostbuff);
+    char* IP = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
+    my_hostname = IP;
 
     RunServer(port);
 

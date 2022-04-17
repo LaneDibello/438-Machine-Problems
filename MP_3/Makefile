@@ -16,7 +16,7 @@ PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
-all: system-check tsc tsd tsf tso
+all: cltxt system-check tsc tsd tsf tso
 
 #Client recipe
 tsc: sns.pb.o sns.grpc.pb.o tsc.o
@@ -41,6 +41,9 @@ tso: sns.pb.o sns.grpc.pb.o tso.o
 .PRECIOUS: %.pb.cc
 %.pb.cc: %.proto
 	$(PROTOC) --cpp_out=. $<
+
+cltxt:
+	rm -f *.txt
 
 clean:
 	rm -f *.txt *.o *.pb.cc *.pb.h client server synchronizer coordinator

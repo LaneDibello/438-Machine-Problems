@@ -6,6 +6,10 @@
 #include <fstream>
 #include <thread>
 #include <iostream>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <memory>
 #include <string>
 #include <stdlib.h>
@@ -57,6 +61,7 @@ std::unique_ptr<csce438::SNSSandMInform::Stub> s_stub = nullptr; //slave/master
 int s_id;
 bool isMaster;
 std::string my_port;
+std::string my_hostname;
 
 //Meta Slave info
 std::string slave_port;
@@ -151,17 +156,24 @@ class SNSServiceImpl final : public SNSService::Service
 
     Status List(ServerContext *context, const Request *request, ListReply *list_reply) override
     {
-        Client user = client_db[find_user(request->username())];
-        int index = 0;
-        for (Client c : client_db)
+        int id = request->username();
+        //Upgrade me:
+        ClientContext context1;
+        Blep b;
+        AllUsers au;
+        c_stub->GetAllUsers(&context1, b, &au);
+        for (auto u : au.users())
         {
-            list_reply->add_all_users(c.username);
+            list_reply->add_all_users(u);
         }
-        std::vector<int>::const_iterator it;
-        for (it = user.client_followers.begin(); it != user.client_followers.end(); it++)
-        {
-            list_reply->add_followers(*it);
+        std::ifstream ifs(std::to_string(id)+"followedBy.txt");
+        std::string u = "";
+        while (ifs.good()){
+            std::getline(ifs, u, ',');
+            if (u == "" || u == " ") continue;
+            list_reply->add_followers(atoi(u.c_str()));
         }
+
         return Status::OK;
     }
 
@@ -398,7 +410,7 @@ void RunServer(std::string port_no)
     ClientContext context;
     Status s;
     ClusterInfo ci;
-    ci.set_addr("127.0.0.1"); //Later get own hostname!!!
+    ci.set_addr(my_hostname); 
     ci.set_port(port_no);
     ci.set_id(s_id);
     ci.set_master(isMaster);
@@ -510,6 +522,12 @@ int main(int argc, char **argv)
             i++;
         }
     }
+    
+    char hostbuff[32];
+    int host = gethostname(hostbuff, 32);
+    struct hostent *host_entry = gethostbyname(hostbuff);
+    char* IP = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
+    my_hostname = IP;
 
     RunServer(my_port);
 

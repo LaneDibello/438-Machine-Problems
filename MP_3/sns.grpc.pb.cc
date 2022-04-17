@@ -393,6 +393,7 @@ static const char* SNSCoord_method_names[] = {
   "/csce438.SNSCoord/GetConnection",
   "/csce438.SNSCoord/GetFollowing",
   "/csce438.SNSCoord/Gucci",
+  "/csce438.SNSCoord/GetAllUsers",
 };
 
 std::unique_ptr< SNSCoord::Stub> SNSCoord::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -407,6 +408,7 @@ SNSCoord::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, 
   , rpcmethod_GetConnection_(SNSCoord_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetFollowing_(SNSCoord_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_Gucci_(SNSCoord_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetAllUsers_(SNSCoord_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status SNSCoord::Stub::ClusterSpawn(::grpc::ClientContext* context, const ::csce438::ClusterInfo& request, ::csce438::ServerIdent* response) {
@@ -524,6 +526,29 @@ void SNSCoord::Stub::async::Gucci(::grpc::ClientContext* context, const ::csce43
   return result;
 }
 
+::grpc::Status SNSCoord::Stub::GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep& request, ::csce438::AllUsers* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::csce438::Blep, ::csce438::AllUsers, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetAllUsers_, context, request, response);
+}
+
+void SNSCoord::Stub::async::GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::csce438::Blep, ::csce438::AllUsers, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetAllUsers_, context, request, response, std::move(f));
+}
+
+void SNSCoord::Stub::async::GetAllUsers(::grpc::ClientContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetAllUsers_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>* SNSCoord::Stub::PrepareAsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::csce438::AllUsers, ::csce438::Blep, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetAllUsers_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::csce438::AllUsers>* SNSCoord::Stub::AsyncGetAllUsersRaw(::grpc::ClientContext* context, const ::csce438::Blep& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncGetAllUsersRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 SNSCoord::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       SNSCoord_method_names[0],
@@ -575,6 +600,16 @@ SNSCoord::Service::Service() {
              ::csce438::HrtBt* resp) {
                return service->Gucci(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      SNSCoord_method_names[5],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< SNSCoord::Service, ::csce438::Blep, ::csce438::AllUsers, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](SNSCoord::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::csce438::Blep* req,
+             ::csce438::AllUsers* resp) {
+               return service->GetAllUsers(ctx, req, resp);
+             }, this)));
 }
 
 SNSCoord::Service::~Service() {
@@ -609,6 +644,13 @@ SNSCoord::Service::~Service() {
 }
 
 ::grpc::Status SNSCoord::Service::Gucci(::grpc::ServerContext* context, const ::csce438::HrtBt* request, ::csce438::HrtBt* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status SNSCoord::Service::GetAllUsers(::grpc::ServerContext* context, const ::csce438::Blep* request, ::csce438::AllUsers* response) {
   (void) context;
   (void) request;
   (void) response;

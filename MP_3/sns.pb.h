@@ -47,7 +47,7 @@ struct TableStruct_sns_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[13]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[14]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -55,6 +55,9 @@ struct TableStruct_sns_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto;
 namespace csce438 {
+class AllUsers;
+struct AllUsersDefaultTypeInternal;
+extern AllUsersDefaultTypeInternal _AllUsers_default_instance_;
 class Blep;
 struct BlepDefaultTypeInternal;
 extern BlepDefaultTypeInternal _Blep_default_instance_;
@@ -96,6 +99,7 @@ struct ServerIdentDefaultTypeInternal;
 extern ServerIdentDefaultTypeInternal _ServerIdent_default_instance_;
 }  // namespace csce438
 PROTOBUF_NAMESPACE_OPEN
+template<> ::csce438::AllUsers* Arena::CreateMaybeMessage<::csce438::AllUsers>(Arena*);
 template<> ::csce438::Blep* Arena::CreateMaybeMessage<::csce438::Blep>(Arena*);
 template<> ::csce438::ClusterInfo* Arena::CreateMaybeMessage<::csce438::ClusterInfo>(Arena*);
 template<> ::csce438::FollowData* Arena::CreateMaybeMessage<::csce438::FollowData>(Arena*);
@@ -2292,6 +2296,163 @@ class FollowPair final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sns_2eproto;
 };
+// -------------------------------------------------------------------
+
+class AllUsers final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:csce438.AllUsers) */ {
+ public:
+  inline AllUsers() : AllUsers(nullptr) {}
+  ~AllUsers() override;
+  explicit constexpr AllUsers(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  AllUsers(const AllUsers& from);
+  AllUsers(AllUsers&& from) noexcept
+    : AllUsers() {
+    *this = ::std::move(from);
+  }
+
+  inline AllUsers& operator=(const AllUsers& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AllUsers& operator=(AllUsers&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AllUsers& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AllUsers* internal_default_instance() {
+    return reinterpret_cast<const AllUsers*>(
+               &_AllUsers_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  friend void swap(AllUsers& a, AllUsers& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AllUsers* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AllUsers* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AllUsers* New() const final {
+    return new AllUsers();
+  }
+
+  AllUsers* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<AllUsers>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const AllUsers& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const AllUsers& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AllUsers* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "csce438.AllUsers";
+  }
+  protected:
+  explicit AllUsers(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUsersFieldNumber = 1,
+  };
+  // repeated int32 users = 1;
+  int users_size() const;
+  private:
+  int _internal_users_size() const;
+  public:
+  void clear_users();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_users(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_users() const;
+  void _internal_add_users(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_users();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 users(int index) const;
+  void set_users(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_users(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      users() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_users();
+
+  // @@protoc_insertion_point(class_scope:csce438.AllUsers)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > users_;
+  mutable std::atomic<int> _users_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sns_2eproto;
+};
 // ===================================================================
 
 
@@ -3415,9 +3576,62 @@ inline void FollowPair::set_fid(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:csce438.FollowPair.fid)
 }
 
+// -------------------------------------------------------------------
+
+// AllUsers
+
+// repeated int32 users = 1;
+inline int AllUsers::_internal_users_size() const {
+  return users_.size();
+}
+inline int AllUsers::users_size() const {
+  return _internal_users_size();
+}
+inline void AllUsers::clear_users() {
+  users_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AllUsers::_internal_users(int index) const {
+  return users_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AllUsers::users(int index) const {
+  // @@protoc_insertion_point(field_get:csce438.AllUsers.users)
+  return _internal_users(index);
+}
+inline void AllUsers::set_users(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  users_.Set(index, value);
+  // @@protoc_insertion_point(field_set:csce438.AllUsers.users)
+}
+inline void AllUsers::_internal_add_users(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  users_.Add(value);
+}
+inline void AllUsers::add_users(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_users(value);
+  // @@protoc_insertion_point(field_add:csce438.AllUsers.users)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+AllUsers::_internal_users() const {
+  return users_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+AllUsers::users() const {
+  // @@protoc_insertion_point(field_list:csce438.AllUsers.users)
+  return _internal_users();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+AllUsers::_internal_mutable_users() {
+  return &users_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+AllUsers::mutable_users() {
+  // @@protoc_insertion_point(field_mutable_list:csce438.AllUsers.users)
+  return _internal_mutable_users();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

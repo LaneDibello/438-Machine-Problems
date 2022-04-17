@@ -2,6 +2,10 @@
 #include <memory>
 #include <thread>
 #include <vector>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string>
 #include <unistd.h>
 #include <grpc++/grpc++.h>
@@ -16,6 +20,8 @@ using grpc::ClientWriter;
 using grpc::Status;
 
 using namespace csce438;
+
+std::string my_hostname;
 
 // Coord info
 std::string c_hostname;
@@ -124,6 +130,12 @@ int main(int argc, char **argv)
             i++;
         }
     }
+
+    char hostbuff[32];
+    int host = gethostname(hostbuff, 32);
+    struct hostent *host_entry = gethostbyname(hostbuff);
+    char* IP = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
+    my_hostname = IP;
 
     //std::string username = "u" + std::to_string(c_id);
 

@@ -27,6 +27,7 @@ service SNSCoord{
   rpc GetConnection (JoinReq) returns (ClusterInfo) {} //Client sends this to coord
   rpc GetFollowing (JoinReq) returns (FollowerInfo) {} //Get's follower for id in JoinReq
   rpc Gucci (HrtBt) returns (HrtBt) {} //Are you stil there? (´･_･`)
+  rpc GetAllUsers (Blep) returns (AllUsers) {} //Gets every registered user
 }
 
 service SNSFollower{
@@ -126,4 +127,9 @@ message FollowPair {
   //Client id follows fid
   int32 id = 1;
   int32 fid = 2; 
+}
+
+//Every singel registered user
+message AllUsers {
+    repeated int32 users = 1;
 }

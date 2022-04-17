@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <map>
+#include <iterator>
 #include <mutex>
 #include <set>
 #include <string>
@@ -236,8 +237,9 @@ class SNSCoordImpl final : public SNSCoord::Service
     Status GetFollowing(ServerContext *context, const JoinReq *request, FollowerInfo *response) override
     {
         int cid = request->id();
+        std::cout << "A sychronoizer is requesting the f_id for client: " << cid << std::endl;
         try{
-            struct flwr *f = l_map[cid];
+            struct flwr *f = l_map.at(cid);
 
             response->set_addr(f->addr);
             response->set_port(f->port);
@@ -284,6 +286,11 @@ class SNSCoordImpl final : public SNSCoord::Service
             return Status::CANCELLED;
         }
         response->set_dope(true);
+        return Status::OK;
+    }
+
+    Status GetAllUsers(ServerContext *context, const Blep* request, AllUsers* response) override {
+        response->mutable_users()->Add(reg_c.begin(), reg_c.end());
         return Status::OK;
     }
 };
