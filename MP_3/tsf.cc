@@ -277,7 +277,7 @@ void checkTimelineUpdates(int uid){
             std::ifstream ifs1(std::to_string(uid)+"followedBy.txt");
             std::vector<int> followers;
             std::string u = "";
-            while(ifs.good()){
+            while(ifs1.good()){
                 std::getline(ifs1, u, ',');
                 if(u == "") continue;
                 followers.push_back(atoi(u.c_str()));
@@ -304,7 +304,8 @@ void checkTimelineUpdates(int uid){
                 mc.set_id(f);
                 Blep b;
 
-                f_stub->newMessage(&context, mc, &b);
+                ClientContext context1;
+                f_stub->newMessage(&context1, mc, &b);
             }
         }
     }

@@ -1,8 +1,8 @@
 MP1/crc
 MP1/crsd
-client
-server
-synchronizer
-coordinator
-*.txt
-*.o
+MP_3/client
+MP_3/server
+MP_3/synchronizer
+MP_3/coordinator
+MP_3/*.txt
+MP_3/*.o

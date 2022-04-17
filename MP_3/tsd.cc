@@ -6,6 +6,8 @@
 #include <fstream>
 #include <thread>
 #include <iostream>
+#include <stack>
+#include <sstream>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -266,11 +268,58 @@ class SNSServiceImpl final : public SNSService::Service
     {
         Message message;
         Client *c;
+
+        bool first_time = true;
+
         while (stream->Read(&message))
         {
             int username = message.username();
             int user_index = find_user(username);
             c = &client_db[user_index];
+
+            if (first_time){
+                //Flood Client stream with messages
+                std::cout << username << " has open timeline" << std::endl;
+                std::stack<Message> msg_stack;
+                std::ifstream ifs(std::to_string(username) + "fTimelines.txt");
+                std::string p = "";
+                std::string p_un = "";
+                std::string p_text = "";
+                std::string p_time = "";
+                while (ifs.good()){
+                    std::getline(ifs, p);
+                    if (p == "") continue;
+                    p_time = p.substr(0, 20);
+                    std::istringstream msg_chunk(p.substr(24));
+                    std::getline(msg_chunk, p_un, ':');
+                    std::getline(msg_chunk, p_text);
+
+                    Message msg_l;
+                    msg_l.set_username(atoi(p_un.c_str()));
+                    msg_l.set_msg(p_text);
+                    google::protobuf::Timestamp *ts = new google::protobuf::Timestamp();
+                    
+                    struct tm tm;
+                    char buf[255];
+                    memset(&tm, 0, sizeof(tm));
+                    strptime(p_time.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm);
+                    time_t stamp = mktime(&tm);
+
+                    ts->set_seconds(stamp);
+                    ts->set_nanos(0);
+                    msg_l.set_allocated_timestamp(ts);
+
+                    msg_stack.push(msg_l);
+                }
+                std::cout << "Writing " << msg_stack.size() << " messages to " << username << std::endl;
+                for (int j = 0; j < 20 && !msg_stack.empty(); j++){
+                    if(!stream->Write(msg_stack.top())){
+                        std::cerr << "Failed to write a message to " << username << std::endl;
+                    }
+                    msg_stack.pop();
+                }
+                first_time = false;
+            }
 
             // Write the current message to "usernametimeline.txt"
             std::string filename = std::to_string(username) + "timeline.txt";
