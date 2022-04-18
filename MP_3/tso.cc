@@ -157,11 +157,13 @@ class SNSCoordImpl final : public SNSCoord::Service
             {
                 response->set_addr(cif->master_addr);
                 response->set_port(cif->master_port);
+                response->set_master(true);
             }
             else
             {
                 response->set_addr(cif->slave_addr);
                 response->set_port(cif->slave_port);
+                response->set_master(false);
                 std::cout << "NOTICE: Client " << cid << " is now running off of the slave" << std::endl;
             }
             if (reg_c.count(cid)){

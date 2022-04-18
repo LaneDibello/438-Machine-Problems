@@ -204,6 +204,13 @@ int Client::connectTo()
     {
         return -1;
     }
+    if (ci.master()){
+        std::cout << "Connected to MASTER server at " << hostname << ":" << port << std::endl;
+    }
+    else {
+        std::cout << "Connected to SLAVE server at " << hostname << ":" << port << std::endl;
+    }
+    
     return 1;
 }
 
