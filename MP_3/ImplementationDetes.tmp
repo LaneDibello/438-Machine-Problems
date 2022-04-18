@@ -15,3 +15,6 @@ $./coordinator -p <portNum>
 $./server -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <idNum> -t <master/slave>
 $./synchronizer -cip <coordinatorIP> -cp <coordinatorPort> -p <portNum> -id <synchronizerId>
 $./client -cip <coordinatorIP> -cp <coordinatorPort> -id <clientId>
+
+$sh killServers.sh 
+$sh runCluster.sh <Id>
