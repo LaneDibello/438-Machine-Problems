@@ -73,7 +73,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ReplyDefaultTypeInternal _Reply
 constexpr Message::Message(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : msg_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , timestamp_(nullptr)
+  , timestamp_(uint64_t{0u})
   , username_(0){}
 struct MessageDefaultTypeInternal {
   constexpr MessageDefaultTypeInternal()
@@ -365,56 +365,52 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_sns_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tsns.proto\022\007csce438\032\037google/protobuf/ti"
-  "mestamp.proto\"\024\n\004Blep\022\014\n\004dope\030\001 \001(\010\"1\n\tL"
-  "istReply\022\021\n\tall_users\030\001 \003(\005\022\021\n\tfollowers"
-  "\030\002 \003(\005\".\n\007Request\022\020\n\010username\030\001 \001(\005\022\021\n\ta"
-  "rguments\030\002 \003(\005\"\024\n\005Reply\022\013\n\003msg\030\001 \001(\t\"W\n\007"
-  "Message\022\020\n\010username\030\001 \001(\005\022\013\n\003msg\030\002 \001(\t\022-"
-  "\n\ttimestamp\030\003 \001(\0132\032.google.protobuf.Time"
-  "stamp\"C\n\014FollowerInfo\022\014\n\004addr\030\001 \001(\t\022\014\n\004p"
-  "ort\030\002 \001(\t\022\n\n\002id\030\003 \001(\005\022\013\n\003sid\030\004 \001(\005\"E\n\013Cl"
-  "usterInfo\022\014\n\004addr\030\001 \001(\t\022\014\n\004port\030\002 \001(\t\022\n\n"
-  "\002id\030\003 \001(\005\022\016\n\006master\030\004 \001(\010\"\025\n\007JoinReq\022\n\n\002"
-  "id\030\001 \001(\005\"#\n\005HrtBt\022\n\n\002id\030\001 \001(\005\022\016\n\006master\030"
-  "\002 \001(\010\"9\n\013ServerIdent\022\016\n\006master\030\001 \001(\010\022\014\n\004"
-  "port\030\002 \001(\t\022\014\n\004addr\030\003 \001(\t\">\n\nFollowData\022\n"
-  "\n\002id\030\001 \001(\005\022\021\n\tfollowing\030\002 \003(\005\022\021\n\tfollowe"
-  "rs\030\003 \003(\005\"$\n\010MsgChunk\022\n\n\002id\030\001 \001(\005\022\014\n\004msgs"
-  "\030\002 \003(\t\"%\n\nFollowPair\022\n\n\002id\030\001 \001(\005\022\013\n\003fid\030"
-  "\002 \001(\005\"\031\n\010AllUsers\022\r\n\005users\030\001 \003(\0052\315\001\n\nSNS"
-  "Service\022+\n\005Login\022\020.csce438.Request\032\016.csc"
-  "e438.Reply\"\000\022.\n\004List\022\020.csce438.Request\032\022"
-  ".csce438.ListReply\"\000\022,\n\006Follow\022\020.csce438"
-  ".Request\032\016.csce438.Reply\"\000\0224\n\010Timeline\022\020"
-  ".csce438.Message\032\020.csce438.Message\"\000(\0010\001"
-  "2\353\001\n\016SNSSandMInform\022:\n\nPokeMaster\022\024.csce"
+  "\n\tsns.proto\022\007csce438\"\024\n\004Blep\022\014\n\004dope\030\001 \001"
+  "(\010\"1\n\tListReply\022\021\n\tall_users\030\001 \003(\005\022\021\n\tfo"
+  "llowers\030\002 \003(\005\".\n\007Request\022\020\n\010username\030\001 \001"
+  "(\005\022\021\n\targuments\030\002 \003(\005\"\024\n\005Reply\022\013\n\003msg\030\001 "
+  "\001(\t\";\n\007Message\022\020\n\010username\030\001 \001(\005\022\013\n\003msg\030"
+  "\002 \001(\t\022\021\n\ttimestamp\030\003 \001(\004\"C\n\014FollowerInfo"
+  "\022\014\n\004addr\030\001 \001(\t\022\014\n\004port\030\002 \001(\t\022\n\n\002id\030\003 \001(\005"
+  "\022\013\n\003sid\030\004 \001(\005\"E\n\013ClusterInfo\022\014\n\004addr\030\001 \001"
+  "(\t\022\014\n\004port\030\002 \001(\t\022\n\n\002id\030\003 \001(\005\022\016\n\006master\030\004"
+  " \001(\010\"\025\n\007JoinReq\022\n\n\002id\030\001 \001(\005\"#\n\005HrtBt\022\n\n\002"
+  "id\030\001 \001(\005\022\016\n\006master\030\002 \001(\010\"9\n\013ServerIdent\022"
+  "\016\n\006master\030\001 \001(\010\022\014\n\004port\030\002 \001(\t\022\014\n\004addr\030\003 "
+  "\001(\t\">\n\nFollowData\022\n\n\002id\030\001 \001(\005\022\021\n\tfollowi"
+  "ng\030\002 \003(\005\022\021\n\tfollowers\030\003 \003(\005\"$\n\010MsgChunk\022"
+  "\n\n\002id\030\001 \001(\005\022\014\n\004msgs\030\002 \003(\t\"%\n\nFollowPair\022"
+  "\n\n\002id\030\001 \001(\005\022\013\n\003fid\030\002 \001(\005\"\031\n\010AllUsers\022\r\n\005"
+  "users\030\001 \003(\0052\250\003\n\nSNSService\022+\n\005Login\022\020.cs"
+  "ce438.Request\032\016.csce438.Reply\"\000\022.\n\004List\022"
+  "\020.csce438.Request\032\022.csce438.ListReply\"\000\022"
+  ",\n\006Follow\022\020.csce438.Request\032\016.csce438.Re"
+  "ply\"\000\0224\n\010Timeline\022\020.csce438.Message\032\020.cs"
+  "ce438.Message\"\000(\0010\001\022:\n\nPokeMaster\022\024.csce"
   "438.ServerIdent\032\024.csce438.ServerIdent\"\000\022"
   "1\n\013LoginUpdate\022\020.csce438.Request\032\016.csce4"
   "38.Reply\"\000\0224\n\014FollowUpdate\022\023.csce438.Fol"
   "lowData\032\r.csce438.Blep\"\000\0224\n\016TimelineUpda"
-  "te\022\021.csce438.MsgChunk\032\r.csce438.Blep\"\0002\325"
-  "\002\n\010SNSCoord\022<\n\014ClusterSpawn\022\024.csce438.Cl"
-  "usterInfo\032\024.csce438.ServerIdent\"\000\0227\n\rFol"
-  "lowerSpawn\022\025.csce438.FollowerInfo\032\r.csce"
-  "438.Blep\"\000\0229\n\rGetConnection\022\020.csce438.Jo"
-  "inReq\032\024.csce438.ClusterInfo\"\000\0229\n\014GetFoll"
-  "owing\022\020.csce438.JoinReq\032\025.csce438.Follow"
-  "erInfo\"\000\022)\n\005Gucci\022\016.csce438.HrtBt\032\016.csce"
-  "438.HrtBt\"\000\0221\n\013GetAllUsers\022\r.csce438.Ble"
-  "p\032\021.csce438.AllUsers\"\0002\242\001\n\013SNSFollower\0221"
-  "\n\tFollowing\022\023.csce438.FollowPair\032\r.csce4"
-  "38.Blep\"\000\0220\n\nnewMessage\022\021.csce438.MsgChu"
-  "nk\032\r.csce438.Blep\"\000\022.\n\tnewClient\022\020.csce4"
-  "38.JoinReq\032\r.csce438.Blep\"\000b\006proto3"
+  "te\022\021.csce438.MsgChunk\032\r.csce438.Blep\"\0002\020"
+  "\n\016SNSSandMInform2\325\002\n\010SNSCoord\022<\n\014Cluster"
+  "Spawn\022\024.csce438.ClusterInfo\032\024.csce438.Se"
+  "rverIdent\"\000\0227\n\rFollowerSpawn\022\025.csce438.F"
+  "ollowerInfo\032\r.csce438.Blep\"\000\0229\n\rGetConne"
+  "ction\022\020.csce438.JoinReq\032\024.csce438.Cluste"
+  "rInfo\"\000\0229\n\014GetFollowing\022\020.csce438.JoinRe"
+  "q\032\025.csce438.FollowerInfo\"\000\022)\n\005Gucci\022\016.cs"
+  "ce438.HrtBt\032\016.csce438.HrtBt\"\000\0221\n\013GetAllU"
+  "sers\022\r.csce438.Blep\032\021.csce438.AllUsers\"\000"
+  "2\242\001\n\013SNSFollower\0221\n\tFollowing\022\023.csce438."
+  "FollowPair\032\r.csce438.Blep\"\000\0220\n\nnewMessag"
+  "e\022\021.csce438.MsgChunk\032\r.csce438.Blep\"\000\022.\n"
+  "\tnewClient\022\020.csce438.JoinReq\032\r.csce438.B"
+  "lep\"\000b\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_sns_2eproto_deps[1] = {
-  &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
-};
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sns_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sns_2eproto = {
-  false, false, 1675, descriptor_table_protodef_sns_2eproto, "sns.proto", 
-  &descriptor_table_sns_2eproto_once, descriptor_table_sns_2eproto_deps, 1, 14,
+  false, false, 1613, descriptor_table_protodef_sns_2eproto, "sns.proto", 
+  &descriptor_table_sns_2eproto_once, nullptr, 0, 14,
   schemas, file_default_instances, TableStruct_sns_2eproto::offsets,
   file_level_metadata_sns_2eproto, file_level_enum_descriptors_sns_2eproto, file_level_service_descriptors_sns_2eproto,
 };
@@ -1255,19 +1251,8 @@ void Reply::InternalSwap(Reply* other) {
 
 class Message::_Internal {
  public:
-  static const ::PROTOBUF_NAMESPACE_ID::Timestamp& timestamp(const Message* msg);
 };
 
-const ::PROTOBUF_NAMESPACE_ID::Timestamp&
-Message::_Internal::timestamp(const Message* msg) {
-  return *msg->timestamp_;
-}
-void Message::clear_timestamp() {
-  if (GetArenaForAllocation() == nullptr && timestamp_ != nullptr) {
-    delete timestamp_;
-  }
-  timestamp_ = nullptr;
-}
 Message::Message(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -1285,12 +1270,9 @@ Message::Message(const Message& from)
     msg_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_msg(), 
       GetArenaForAllocation());
   }
-  if (from._internal_has_timestamp()) {
-    timestamp_ = new ::PROTOBUF_NAMESPACE_ID::Timestamp(*from.timestamp_);
-  } else {
-    timestamp_ = nullptr;
-  }
-  username_ = from.username_;
+  ::memcpy(&timestamp_, &from.timestamp_,
+    static_cast<size_t>(reinterpret_cast<char*>(&username_) -
+    reinterpret_cast<char*>(&timestamp_)) + sizeof(username_));
   // @@protoc_insertion_point(copy_constructor:csce438.Message)
 }
 
@@ -1312,7 +1294,6 @@ Message::~Message() {
 inline void Message::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   msg_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete timestamp_;
 }
 
 void Message::ArenaDtor(void* object) {
@@ -1332,11 +1313,9 @@ void Message::Clear() {
   (void) cached_has_bits;
 
   msg_.ClearToEmpty();
-  if (GetArenaForAllocation() == nullptr && timestamp_ != nullptr) {
-    delete timestamp_;
-  }
-  timestamp_ = nullptr;
-  username_ = 0;
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&username_) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(username_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1364,10 +1343,10 @@ const char* Message::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
         } else
           goto handle_unusual;
         continue;
-      // .google.protobuf.Timestamp timestamp = 3;
+      // uint64 timestamp = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_timestamp(), ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1417,12 +1396,10 @@ failure:
         2, this->_internal_msg(), target);
   }
 
-  // .google.protobuf.Timestamp timestamp = 3;
-  if (this->_internal_has_timestamp()) {
+  // uint64 timestamp = 3;
+  if (this->_internal_timestamp() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        3, _Internal::timestamp(this), target, stream);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(3, this->_internal_timestamp(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1448,11 +1425,9 @@ size_t Message::ByteSizeLong() const {
         this->_internal_msg());
   }
 
-  // .google.protobuf.Timestamp timestamp = 3;
-  if (this->_internal_has_timestamp()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *timestamp_);
+  // uint64 timestamp = 3;
+  if (this->_internal_timestamp() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_timestamp());
   }
 
   // int32 username = 1;
@@ -1485,8 +1460,8 @@ void Message::MergeFrom(const Message& from) {
   if (!from._internal_msg().empty()) {
     _internal_set_msg(from._internal_msg());
   }
-  if (from._internal_has_timestamp()) {
-    _internal_mutable_timestamp()->::PROTOBUF_NAMESPACE_ID::Timestamp::MergeFrom(from._internal_timestamp());
+  if (from._internal_timestamp() != 0) {
+    _internal_set_timestamp(from._internal_timestamp());
   }
   if (from._internal_username() != 0) {
     _internal_set_username(from._internal_username());

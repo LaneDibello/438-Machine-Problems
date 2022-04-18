@@ -66,6 +66,35 @@ class SNSService final {
     std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>> PrepareAsyncTimeline(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>>(PrepareAsyncTimelineRaw(context, cq));
     }
+    // Slave Master interactions
+    virtual ::grpc::Status PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::csce438::ServerIdent* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>> AsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>>(AsyncPokeMasterRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>> PrepareAsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>>(PrepareAsyncPokeMasterRaw(context, request, cq));
+    }
+    virtual ::grpc::Status LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> AsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(AsyncLoginUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> PrepareAsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(PrepareAsyncLoginUpdateRaw(context, request, cq));
+    }
+    virtual ::grpc::Status FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::csce438::Blep* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncFollowUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncFollowUpdateRaw(context, request, cq));
+    }
+    virtual ::grpc::Status TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncTimelineUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncTimelineUpdateRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -76,6 +105,15 @@ class SNSService final {
       virtual void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Timeline(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::csce438::Message,::csce438::Message>* reactor) = 0;
+      // Slave Master interactions
+      virtual void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -90,6 +128,14 @@ class SNSService final {
     virtual ::grpc::ClientReaderWriterInterface< ::csce438::Message, ::csce438::Message>* TimelineRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>* AsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::csce438::Message, ::csce438::Message>* PrepareAsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>* AsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>* PrepareAsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* AsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* PrepareAsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -124,6 +170,34 @@ class SNSService final {
     std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>> PrepareAsyncTimeline(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>>(PrepareAsyncTimelineRaw(context, cq));
     }
+    ::grpc::Status PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::csce438::ServerIdent* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>> AsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>>(AsyncPokeMasterRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>> PrepareAsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>>(PrepareAsyncPokeMasterRaw(context, request, cq));
+    }
+    ::grpc::Status LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> AsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(AsyncLoginUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> PrepareAsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(PrepareAsyncLoginUpdateRaw(context, request, cq));
+    }
+    ::grpc::Status FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::csce438::Blep* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncFollowUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncFollowUpdateRaw(context, request, cq));
+    }
+    ::grpc::Status TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncTimelineUpdateRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncTimelineUpdateRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -134,6 +208,14 @@ class SNSService final {
       void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
       void Follow(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Timeline(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::csce438::Message,::csce438::Message>* reactor) override;
+      void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)>) override;
+      void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
+      void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
+      void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
+      void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -154,10 +236,22 @@ class SNSService final {
     ::grpc::ClientReaderWriter< ::csce438::Message, ::csce438::Message>* TimelineRaw(::grpc::ClientContext* context) override;
     ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>* AsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReaderWriter< ::csce438::Message, ::csce438::Message>* PrepareAsyncTimelineRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* AsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* PrepareAsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* AsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* PrepareAsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Login_;
     const ::grpc::internal::RpcMethod rpcmethod_List_;
     const ::grpc::internal::RpcMethod rpcmethod_Follow_;
     const ::grpc::internal::RpcMethod rpcmethod_Timeline_;
+    const ::grpc::internal::RpcMethod rpcmethod_PokeMaster_;
+    const ::grpc::internal::RpcMethod rpcmethod_LoginUpdate_;
+    const ::grpc::internal::RpcMethod rpcmethod_FollowUpdate_;
+    const ::grpc::internal::RpcMethod rpcmethod_TimelineUpdate_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -169,6 +263,11 @@ class SNSService final {
     virtual ::grpc::Status List(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::ListReply* response);
     virtual ::grpc::Status Follow(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
     virtual ::grpc::Status Timeline(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::csce438::Message, ::csce438::Message>* stream);
+    // Slave Master interactions
+    virtual ::grpc::Status PokeMaster(::grpc::ServerContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response);
+    virtual ::grpc::Status LoginUpdate(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
+    virtual ::grpc::Status FollowUpdate(::grpc::ServerContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response);
+    virtual ::grpc::Status TimelineUpdate(::grpc::ServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Login : public BaseClass {
@@ -250,7 +349,87 @@ class SNSService final {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Login<WithAsyncMethod_List<WithAsyncMethod_Follow<WithAsyncMethod_Timeline<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_PokeMaster : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_PokeMaster() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_PokeMaster() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestPokeMaster(::grpc::ServerContext* context, ::csce438::ServerIdent* request, ::grpc::ServerAsyncResponseWriter< ::csce438::ServerIdent>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_LoginUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_LoginUpdate() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_LoginUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestLoginUpdate(::grpc::ServerContext* context, ::csce438::Request* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_FollowUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_FollowUpdate() {
+      ::grpc::Service::MarkMethodAsync(6);
+    }
+    ~WithAsyncMethod_FollowUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFollowUpdate(::grpc::ServerContext* context, ::csce438::FollowData* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_TimelineUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_TimelineUpdate() {
+      ::grpc::Service::MarkMethodAsync(7);
+    }
+    ~WithAsyncMethod_TimelineUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestTimelineUpdate(::grpc::ServerContext* context, ::csce438::MsgChunk* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Login<WithAsyncMethod_List<WithAsyncMethod_Follow<WithAsyncMethod_Timeline<WithAsyncMethod_PokeMaster<WithAsyncMethod_LoginUpdate<WithAsyncMethod_FollowUpdate<WithAsyncMethod_TimelineUpdate<Service > > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Login : public BaseClass {
    private:
@@ -355,7 +534,115 @@ class SNSService final {
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
-  typedef WithCallbackMethod_Login<WithCallbackMethod_List<WithCallbackMethod_Follow<WithCallbackMethod_Timeline<Service > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_PokeMaster : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_PokeMaster() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::ServerIdent, ::csce438::ServerIdent>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response) { return this->PokeMaster(context, request, response); }));}
+    void SetMessageAllocatorFor_PokeMaster(
+        ::grpc::MessageAllocator< ::csce438::ServerIdent, ::csce438::ServerIdent>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::ServerIdent, ::csce438::ServerIdent>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_PokeMaster() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* PokeMaster(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_LoginUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_LoginUpdate() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) { return this->LoginUpdate(context, request, response); }));}
+    void SetMessageAllocatorFor_LoginUpdate(
+        ::grpc::MessageAllocator< ::csce438::Request, ::csce438::Reply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_LoginUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* LoginUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_FollowUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_FollowUpdate() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::FollowData, ::csce438::Blep>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response) { return this->FollowUpdate(context, request, response); }));}
+    void SetMessageAllocatorFor_FollowUpdate(
+        ::grpc::MessageAllocator< ::csce438::FollowData, ::csce438::Blep>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::FollowData, ::csce438::Blep>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_FollowUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* FollowUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_TimelineUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_TimelineUpdate() {
+      ::grpc::Service::MarkMethodCallback(7,
+          new ::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response) { return this->TimelineUpdate(context, request, response); }));}
+    void SetMessageAllocatorFor_TimelineUpdate(
+        ::grpc::MessageAllocator< ::csce438::MsgChunk, ::csce438::Blep>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(7);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_TimelineUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* TimelineUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_Login<WithCallbackMethod_List<WithCallbackMethod_Follow<WithCallbackMethod_Timeline<WithCallbackMethod_PokeMaster<WithCallbackMethod_LoginUpdate<WithCallbackMethod_FollowUpdate<WithCallbackMethod_TimelineUpdate<Service > > > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Login : public BaseClass {
@@ -421,6 +708,74 @@ class SNSService final {
     }
     // disable synchronous version of this method
     ::grpc::Status Timeline(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::csce438::Message, ::csce438::Message>* /*stream*/)  override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_PokeMaster : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_PokeMaster() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_PokeMaster() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_LoginUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_LoginUpdate() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_LoginUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_FollowUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_FollowUpdate() {
+      ::grpc::Service::MarkMethodGeneric(6);
+    }
+    ~WithGenericMethod_FollowUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_TimelineUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_TimelineUpdate() {
+      ::grpc::Service::MarkMethodGeneric(7);
+    }
+    ~WithGenericMethod_TimelineUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -503,6 +858,86 @@ class SNSService final {
     }
     void RequestTimeline(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(3, context, stream, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_PokeMaster : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_PokeMaster() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_PokeMaster() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestPokeMaster(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_LoginUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_LoginUpdate() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_LoginUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestLoginUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_FollowUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_FollowUpdate() {
+      ::grpc::Service::MarkMethodRaw(6);
+    }
+    ~WithRawMethod_FollowUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFollowUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_TimelineUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_TimelineUpdate() {
+      ::grpc::Service::MarkMethodRaw(7);
+    }
+    ~WithRawMethod_TimelineUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestTimelineUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -595,6 +1030,94 @@ class SNSService final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_PokeMaster : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_PokeMaster() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->PokeMaster(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_PokeMaster() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* PokeMaster(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_LoginUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_LoginUpdate() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->LoginUpdate(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_LoginUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* LoginUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_FollowUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_FollowUpdate() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->FollowUpdate(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_FollowUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* FollowUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_TimelineUpdate : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_TimelineUpdate() {
+      ::grpc::Service::MarkMethodRawCallback(7,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->TimelineUpdate(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_TimelineUpdate() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* TimelineUpdate(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_Login : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -675,584 +1198,13 @@ class SNSService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedFollow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::Request,::csce438::Reply>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<Service > > > StreamedUnaryService;
-  typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<Service > > > StreamedService;
-};
-
-// Master/Slave Interaction
-class SNSSandMInform final {
- public:
-  static constexpr char const* service_full_name() {
-    return "csce438.SNSSandMInform";
-  }
-  class StubInterface {
-   public:
-    virtual ~StubInterface() {}
-    virtual ::grpc::Status PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::csce438::ServerIdent* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>> AsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>>(AsyncPokeMasterRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>> PrepareAsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>>(PrepareAsyncPokeMasterRaw(context, request, cq));
-    }
-    virtual ::grpc::Status LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> AsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(AsyncLoginUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>> PrepareAsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>>(PrepareAsyncLoginUpdateRaw(context, request, cq));
-    }
-    virtual ::grpc::Status FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::csce438::Blep* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncFollowUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncFollowUpdateRaw(context, request, cq));
-    }
-    virtual ::grpc::Status TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> AsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(AsyncTimelineUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>> PrepareAsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>>(PrepareAsyncTimelineUpdateRaw(context, request, cq));
-    }
-    class async_interface {
-     public:
-      virtual ~async_interface() {}
-      virtual void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-    };
-    typedef class async_interface experimental_async_interface;
-    virtual class async_interface* async() { return nullptr; }
-    class async_interface* experimental_async() { return async(); }
-   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>* AsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::ServerIdent>* PrepareAsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* AsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Reply>* PrepareAsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* AsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::csce438::Blep>* PrepareAsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) = 0;
-  };
-  class Stub final : public StubInterface {
-   public:
-    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    ::grpc::Status PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::csce438::ServerIdent* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>> AsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>>(AsyncPokeMasterRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>> PrepareAsyncPokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>>(PrepareAsyncPokeMasterRaw(context, request, cq));
-    }
-    ::grpc::Status LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::csce438::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> AsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(AsyncLoginUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>> PrepareAsyncLoginUpdate(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Reply>>(PrepareAsyncLoginUpdateRaw(context, request, cq));
-    }
-    ::grpc::Status FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::csce438::Blep* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncFollowUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncFollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncFollowUpdateRaw(context, request, cq));
-    }
-    ::grpc::Status TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::csce438::Blep* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> AsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(AsyncTimelineUpdateRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>> PrepareAsyncTimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::csce438::Blep>>(PrepareAsyncTimelineUpdateRaw(context, request, cq));
-    }
-    class async final :
-      public StubInterface::async_interface {
-     public:
-      void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, std::function<void(::grpc::Status)>) override;
-      void PokeMaster(::grpc::ClientContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, std::function<void(::grpc::Status)>) override;
-      void LoginUpdate(::grpc::ClientContext* context, const ::csce438::Request* request, ::csce438::Reply* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
-      void FollowUpdate(::grpc::ClientContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, std::function<void(::grpc::Status)>) override;
-      void TimelineUpdate(::grpc::ClientContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response, ::grpc::ClientUnaryReactor* reactor) override;
-     private:
-      friend class Stub;
-      explicit async(Stub* stub): stub_(stub) { }
-      Stub* stub() { return stub_; }
-      Stub* stub_;
-    };
-    class async* async() override { return &async_stub_; }
-
-   private:
-    std::shared_ptr< ::grpc::ChannelInterface> channel_;
-    class async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* AsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::ServerIdent>* PrepareAsyncPokeMasterRaw(::grpc::ClientContext* context, const ::csce438::ServerIdent& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* AsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Reply>* PrepareAsyncLoginUpdateRaw(::grpc::ClientContext* context, const ::csce438::Request& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncFollowUpdateRaw(::grpc::ClientContext* context, const ::csce438::FollowData& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* AsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::csce438::Blep>* PrepareAsyncTimelineUpdateRaw(::grpc::ClientContext* context, const ::csce438::MsgChunk& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_PokeMaster_;
-    const ::grpc::internal::RpcMethod rpcmethod_LoginUpdate_;
-    const ::grpc::internal::RpcMethod rpcmethod_FollowUpdate_;
-    const ::grpc::internal::RpcMethod rpcmethod_TimelineUpdate_;
-  };
-  static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-
-  class Service : public ::grpc::Service {
-   public:
-    Service();
-    virtual ~Service();
-    virtual ::grpc::Status PokeMaster(::grpc::ServerContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response);
-    virtual ::grpc::Status LoginUpdate(::grpc::ServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response);
-    virtual ::grpc::Status FollowUpdate(::grpc::ServerContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response);
-    virtual ::grpc::Status TimelineUpdate(::grpc::ServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response);
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_PokeMaster : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodAsync(0);
-    }
-    ~WithAsyncMethod_PokeMaster() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestPokeMaster(::grpc::ServerContext* context, ::csce438::ServerIdent* request, ::grpc::ServerAsyncResponseWriter< ::csce438::ServerIdent>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_LoginUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodAsync(1);
-    }
-    ~WithAsyncMethod_LoginUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestLoginUpdate(::grpc::ServerContext* context, ::csce438::Request* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_FollowUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodAsync(2);
-    }
-    ~WithAsyncMethod_FollowUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestFollowUpdate(::grpc::ServerContext* context, ::csce438::FollowData* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_TimelineUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodAsync(3);
-    }
-    ~WithAsyncMethod_TimelineUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestTimelineUpdate(::grpc::ServerContext* context, ::csce438::MsgChunk* request, ::grpc::ServerAsyncResponseWriter< ::csce438::Blep>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_PokeMaster<WithAsyncMethod_LoginUpdate<WithAsyncMethod_FollowUpdate<WithAsyncMethod_TimelineUpdate<Service > > > > AsyncService;
-  template <class BaseClass>
-  class WithCallbackMethod_PokeMaster : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::ServerIdent, ::csce438::ServerIdent>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::ServerIdent* request, ::csce438::ServerIdent* response) { return this->PokeMaster(context, request, response); }));}
-    void SetMessageAllocatorFor_PokeMaster(
-        ::grpc::MessageAllocator< ::csce438::ServerIdent, ::csce438::ServerIdent>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::ServerIdent, ::csce438::ServerIdent>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_PokeMaster() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* PokeMaster(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithCallbackMethod_LoginUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::Request* request, ::csce438::Reply* response) { return this->LoginUpdate(context, request, response); }));}
-    void SetMessageAllocatorFor_LoginUpdate(
-        ::grpc::MessageAllocator< ::csce438::Request, ::csce438::Reply>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::Request, ::csce438::Reply>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_LoginUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* LoginUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithCallbackMethod_FollowUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::FollowData, ::csce438::Blep>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::FollowData* request, ::csce438::Blep* response) { return this->FollowUpdate(context, request, response); }));}
-    void SetMessageAllocatorFor_FollowUpdate(
-        ::grpc::MessageAllocator< ::csce438::FollowData, ::csce438::Blep>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::FollowData, ::csce438::Blep>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_FollowUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* FollowUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithCallbackMethod_TimelineUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodCallback(3,
-          new ::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::csce438::MsgChunk* request, ::csce438::Blep* response) { return this->TimelineUpdate(context, request, response); }));}
-    void SetMessageAllocatorFor_TimelineUpdate(
-        ::grpc::MessageAllocator< ::csce438::MsgChunk, ::csce438::Blep>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::csce438::MsgChunk, ::csce438::Blep>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_TimelineUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* TimelineUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/)  { return nullptr; }
-  };
-  typedef WithCallbackMethod_PokeMaster<WithCallbackMethod_LoginUpdate<WithCallbackMethod_FollowUpdate<WithCallbackMethod_TimelineUpdate<Service > > > > CallbackService;
-  typedef CallbackService ExperimentalCallbackService;
-  template <class BaseClass>
-  class WithGenericMethod_PokeMaster : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodGeneric(0);
-    }
-    ~WithGenericMethod_PokeMaster() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_LoginUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodGeneric(1);
-    }
-    ~WithGenericMethod_LoginUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_FollowUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodGeneric(2);
-    }
-    ~WithGenericMethod_FollowUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_TimelineUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodGeneric(3);
-    }
-    ~WithGenericMethod_TimelineUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_PokeMaster : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodRaw(0);
-    }
-    ~WithRawMethod_PokeMaster() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestPokeMaster(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_LoginUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodRaw(1);
-    }
-    ~WithRawMethod_LoginUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestLoginUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_FollowUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodRaw(2);
-    }
-    ~WithRawMethod_FollowUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestFollowUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_TimelineUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodRaw(3);
-    }
-    ~WithRawMethod_TimelineUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestTimelineUpdate(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawCallbackMethod_PokeMaster : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodRawCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->PokeMaster(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_PokeMaster() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PokeMaster(::grpc::ServerContext* /*context*/, const ::csce438::ServerIdent* /*request*/, ::csce438::ServerIdent* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* PokeMaster(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithRawCallbackMethod_LoginUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodRawCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->LoginUpdate(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_LoginUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status LoginUpdate(::grpc::ServerContext* /*context*/, const ::csce438::Request* /*request*/, ::csce438::Reply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* LoginUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithRawCallbackMethod_FollowUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodRawCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->FollowUpdate(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_FollowUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status FollowUpdate(::grpc::ServerContext* /*context*/, const ::csce438::FollowData* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* FollowUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
-  class WithRawCallbackMethod_TimelineUpdate : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodRawCallback(3,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->TimelineUpdate(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_TimelineUpdate() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status TimelineUpdate(::grpc::ServerContext* /*context*/, const ::csce438::MsgChunk* /*request*/, ::csce438::Blep* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* TimelineUpdate(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
   template <class BaseClass>
   class WithStreamedUnaryMethod_PokeMaster : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_PokeMaster() {
-      ::grpc::Service::MarkMethodStreamed(0,
+      ::grpc::Service::MarkMethodStreamed(4,
         new ::grpc::internal::StreamedUnaryHandler<
           ::csce438::ServerIdent, ::csce438::ServerIdent>(
             [this](::grpc::ServerContext* context,
@@ -1279,7 +1231,7 @@ class SNSSandMInform final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_LoginUpdate() {
-      ::grpc::Service::MarkMethodStreamed(1,
+      ::grpc::Service::MarkMethodStreamed(5,
         new ::grpc::internal::StreamedUnaryHandler<
           ::csce438::Request, ::csce438::Reply>(
             [this](::grpc::ServerContext* context,
@@ -1306,7 +1258,7 @@ class SNSSandMInform final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_FollowUpdate() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(6,
         new ::grpc::internal::StreamedUnaryHandler<
           ::csce438::FollowData, ::csce438::Blep>(
             [this](::grpc::ServerContext* context,
@@ -1333,7 +1285,7 @@ class SNSSandMInform final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_TimelineUpdate() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler<
           ::csce438::MsgChunk, ::csce438::Blep>(
             [this](::grpc::ServerContext* context,
@@ -1354,9 +1306,60 @@ class SNSSandMInform final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedTimelineUpdate(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::csce438::MsgChunk,::csce438::Blep>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_PokeMaster<WithStreamedUnaryMethod_LoginUpdate<WithStreamedUnaryMethod_FollowUpdate<WithStreamedUnaryMethod_TimelineUpdate<Service > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<WithStreamedUnaryMethod_PokeMaster<WithStreamedUnaryMethod_LoginUpdate<WithStreamedUnaryMethod_FollowUpdate<WithStreamedUnaryMethod_TimelineUpdate<Service > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_PokeMaster<WithStreamedUnaryMethod_LoginUpdate<WithStreamedUnaryMethod_FollowUpdate<WithStreamedUnaryMethod_TimelineUpdate<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_List<WithStreamedUnaryMethod_Follow<WithStreamedUnaryMethod_PokeMaster<WithStreamedUnaryMethod_LoginUpdate<WithStreamedUnaryMethod_FollowUpdate<WithStreamedUnaryMethod_TimelineUpdate<Service > > > > > > > StreamedService;
+};
+
+// Master/Slave Interaction
+class SNSSandMInform final {
+ public:
+  static constexpr char const* service_full_name() {
+    return "csce438.SNSSandMInform";
+  }
+  class StubInterface {
+   public:
+    virtual ~StubInterface() {}
+    class async_interface {
+     public:
+      virtual ~async_interface() {}
+    };
+    typedef class async_interface experimental_async_interface;
+    virtual class async_interface* async() { return nullptr; }
+    class async_interface* experimental_async() { return async(); }
+   private:
+  };
+  class Stub final : public StubInterface {
+   public:
+    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
+    class async final :
+      public StubInterface::async_interface {
+     public:
+     private:
+      friend class Stub;
+      explicit async(Stub* stub): stub_(stub) { }
+      Stub* stub() { return stub_; }
+      Stub* stub_;
+    };
+    class async* async() override { return &async_stub_; }
+
+   private:
+    std::shared_ptr< ::grpc::ChannelInterface> channel_;
+    class async async_stub_{this};
+  };
+  static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
+
+  class Service : public ::grpc::Service {
+   public:
+    Service();
+    virtual ~Service();
+  };
+  typedef Service AsyncService;
+  typedef Service CallbackService;
+  typedef CallbackService ExperimentalCallbackService;
+  typedef Service StreamedUnaryService;
+  typedef Service SplitStreamedService;
+  typedef Service StreamedService;
 };
 
 // The Coordination Service definition

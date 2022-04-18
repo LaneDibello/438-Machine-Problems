@@ -111,6 +111,15 @@ class SNSFollowerImpl final : public SNSFollower::Service{
     }
 };
 
+std::string getTimeStamp(time_t t){
+    char buf[32];
+    struct tm* tm = localtime(&t);
+    strftime (buf, 32, "%Y-%m-%d %H:%M:%S", tm);
+    std::string outt = buf;
+
+    return outt;
+}
+
 //Check if uid follows anyone and then tell their follower about it
 void checkFollowUpdates(int uid) {
     std::set<int> following;
@@ -258,15 +267,20 @@ void checkTimelineUpdates(int uid){
             //mc.set_id(uid);
             while (!posts.empty()){ //we want most recent messages
                 //Time comparsion
-                std::string timestamp = posts.top().substr(0, 20);
-                char nowbuf[100];
-                time_t now = time(0);
-                struct tm *nowtm;
-                nowtm = localtime(&now);
-                nowtm->tm_sec -= 30;
-                mktime(nowtm);
-                strftime(nowbuf, sizeof(nowbuf), "%Y-%m-%dT%H:%M:%SZ", nowtm);
-                if (strncmp(timestamp.c_str(), nowbuf, timestamp.length()) >= 0){
+                std::string timestamp = posts.top().substr(0, 19);
+                struct tm tm;
+                char buf[255];
+                memset(&tm, 0, sizeof(tm));
+                strptime(timestamp.c_str(), "%Y-%m-%d %H:%M:%S", &tm);
+                tm.tm_hour -= 1;
+                time_t stamp = mktime(&tm);
+                time_t now = time(0) - 30;
+
+                //DEBUG
+                // std::cout << "The timestamp is " << ctime(&stamp);
+                // std::cout << "30 seconds ago was " << ctime(&now);
+
+                if (stamp > now){
                     mc.add_msgs(posts.top());
                     msgcount++;
                 }

@@ -31,16 +31,24 @@ std::string c_port;
 int c_id;
 std::unique_ptr<csce438::SNSCoord::Stub> c_stub;
 
+std::string getTimeStamp(time_t t){
+    char buf[32];
+    struct tm* tm = localtime(&t);
+    strftime (buf, 32, "%Y-%m-%d %H:%M:%S", tm);
+    std::string outt = buf;
+
+    return outt;
+}
 
 Message MakeMessage(const int &username, const std::string &msg)
 {
     Message m;
     m.set_username(username);
     m.set_msg(msg);
-    google::protobuf::Timestamp *timestamp = new google::protobuf::Timestamp();
-    timestamp->set_seconds(time(NULL));
-    timestamp->set_nanos(0);
-    m.set_allocated_timestamp(timestamp);
+    //google::protobuf::Timestamp *timestamp = new google::protobuf::Timestamp();
+    //timestamp->set_seconds(time(NULL));
+    //timestamp->set_nanos(0);
+    m.set_timestamp(time(NULL));
     return m;
 }
 
@@ -358,8 +366,7 @@ void Client::Timeline(const int &username)
             Message m;
             while(stream->Read(&m)){
 
-            google::protobuf::Timestamp temptime = m.timestamp();
-            std::time_t time = temptime.seconds();
+            std::time_t time = m.timestamp();
             displayPostMessage(std::to_string(m.username()), m.msg(), time);
             } });
 

@@ -2,23 +2,23 @@ syntax = "proto3";
 
 package csce438;
 
-import "google/protobuf/timestamp.proto";
-
 // The messenger service definition.
 service SNSService{
   rpc Login (Request) returns (Reply) {}
   rpc List (Request) returns (ListReply) {}
   rpc Follow (Request) returns (Reply) {}
   rpc Timeline (stream Message) returns (stream Message) {} 
-}
-
-// Master/Slave Interaction
-service SNSSandMInform{
+  
+  //Slave Master interactions
   rpc PokeMaster (ServerIdent) returns (ServerIdent) {} //Slave tells the master they exist
   rpc LoginUpdate (Request) returns (Reply) {}
   rpc FollowUpdate (FollowData) returns (Blep) {} //Master tells slave about follows
   rpc TimelineUpdate (MsgChunk) returns (Blep) {} //Master tells slaves about messages
 }
+
+// Master/Slave Interaction
+service SNSSandMInform{
+  }
 
 //The Coordination Service definition
 service SNSCoord{
@@ -60,8 +60,8 @@ message Message {
   int32 username = 1;
   //Message from the user
   string msg = 2;
-  //Time the message was sent
-  google.protobuf.Timestamp timestamp = 3;
+  //Time the message was sent in seconds since epoch
+  uint64 timestamp = 3;
 }
 
 message FollowerInfo {

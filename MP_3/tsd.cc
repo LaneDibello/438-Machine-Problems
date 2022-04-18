@@ -59,7 +59,7 @@ std::string c_port;
 
 //Stubs
 std::unique_ptr<csce438::SNSCoord::Stub> c_stub; //Coordinator
-std::unique_ptr<csce438::SNSSandMInform::Stub> s_stub = nullptr; //slave/master
+std::unique_ptr<csce438::SNSService::Stub> s_stub = nullptr; //slave/master
 
 // Meta Server info
 int s_id;
@@ -73,6 +73,15 @@ std::string slave_addr;//likly uneeded for this implementation
 
 // Vector that stores every client that has been created
 std::vector<Client> client_db;
+
+std::string getTimeStamp(time_t t){
+    char buf[32];
+    struct tm* tm = localtime(&t);
+    strftime (buf, 32, "%Y-%m-%d %H:%M:%S", tm);
+    std::string outt = buf;
+
+    return outt;
+}
 
 void heartbeat() {
     Status s;
@@ -128,35 +137,47 @@ static void populate_following(int username, int userindex){
     }
 }
 
-Message parseMessage(std::string p){
+Message parseMessage(std::string p, time_t lasttime, bool& good){
     Message msg_l;
     std::string p_un = "";
     std::string p_text = "";
-    std::string p_time = "";
+    std::string p_time = p.substr(0, 19);
 
-    std::istringstream msg_chunk(p.substr(24));
+    std::istringstream msg_chunk(p.substr(23));
     std::getline(msg_chunk, p_un, ':');
     std::getline(msg_chunk, p_text);
 
     msg_l.set_username(atoi(p_un.c_str()));
     msg_l.set_msg(p_text);
-    google::protobuf::Timestamp *ts = new google::protobuf::Timestamp();
+    //google::protobuf::Timestamp *ts = new google::protobuf::Timestamp();
     
     struct tm tm;
     char buf[255];
     memset(&tm, 0, sizeof(tm));
-    strptime(p_time.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm);
+    strptime(p_time.c_str(), "%Y-%m-%d %H:%M:%S", &tm);
+    tm.tm_hour -= 1;
     time_t stamp = mktime(&tm);
+    good = stamp > lasttime;
 
-    ts->set_seconds(stamp);
-    ts->set_nanos(0);
-    msg_l.set_allocated_timestamp(ts);
+    // {
+    //     //DEBUG
+    //     std::cout << "Stamp was " << ctime(&stamp);
+    //     std::cout << "lasttime was" << ctime(&lasttime);
+    //     std::cout << "So parsed message was ";
+    //     if (good) std::cout << "good!" << std::endl;
+    //     else std::cout << "bad!" << std::endl;
+    // }
+
+    // ts->set_seconds(stamp);
+    // ts->set_nanos(0);
+    msg_l.set_timestamp(stamp);
 
     return msg_l;
 }
 
-void catchTimlineUpdates(int id, ServerReaderWriter<Message, Message> *stream, std::streampos off){
+void catchTimlineUpdates(int id, ServerReaderWriter<Message, Message> *stream){
     //std::ifstream ifs(std::to_string(id) + "fTimelines.txt");
+    time_t lasttime = 0;
     for (;;)
     {
         struct stat statbuf;
@@ -165,22 +186,36 @@ void catchTimlineUpdates(int id, ServerReaderWriter<Message, Message> *stream, s
             perror("stat");
         }
         time_t last_write = statbuf.st_mtim.tv_sec;
-        time_t now = time(nullptr);
+        time_t now = time(NULL);
         double difft = std::difftime(now, last_write);
-        if (difft < 1){
+        if (difft < 2){
             //Do Stuff
+            std::cout << "A Timeline update has been detected for " << id << std::endl;
             std::ifstream ifs(std::to_string(id) + "fTimelines.txt");
-            ifs.seekg(off);
-            std::string p;
+            if (!ifs.good()){
+                std::cerr << "catchTimlineUpdates for " << id << " Failed to open " << id << "fTimelines.txt" << std::endl;
+                sleep(1);
+                continue;
+            }
+            std::string p = "";
+            bool didwrite = false;
             while (ifs.good()){
                 std::getline(ifs, p);
                 if (p == "") continue;
-                Message m = parseMessage(p);
+                bool b;
+                Message m = parseMessage(p, lasttime, b);
+                if (!b) continue;
                 if (!stream->Write(m)){
                     std::cerr << "Bad write for catchTimeLineUpdates for " << id << std::endl;
                 }
+                else {
+                    //TEMP
+                    std::cout << "write to " << id << " Success!" << std::endl;
+                }
+                didwrite = true;
             }
-            off = ifs.tellg();
+            if (didwrite) lasttime = time(NULL);
+            sleep(2);
             ifs.close();
         }
         sleep(1);
@@ -216,7 +251,7 @@ static void login_help(const Request *request, Reply *reply){
 
 class SNSServiceImpl final : public SNSService::Service
 {
-
+    //Client/Server interaction
     Status List(ServerContext *context, const Request *request, ListReply *list_reply) override
     {
         int id = request->username();
@@ -262,8 +297,10 @@ class SNSServiceImpl final : public SNSService::Service
             if (s_stub != nullptr){
                 FollowData fi1;
                 fi1.set_id(username1);
-                std::copy(user1->client_following.begin(), user1->client_following.end(), fi1.mutable_following()->begin());
-                std::copy(user1->client_followers.begin(), user1->client_followers.end(), fi1.mutable_followers()->begin());
+                // std::copy(user1->client_following.begin(), user1->client_following.end(), fi1.mutable_following()->begin());
+                // std::copy(user1->client_followers.begin(), user1->client_followers.end(), fi1.mutable_followers()->begin());
+                fi1.mutable_following()->Add(user1->client_following.begin(), user1->client_following.end());
+                fi1.mutable_followers()->Add(user1->client_followers.begin(), user1->client_followers.end());
 
                 Blep b1;
                 ClientContext context;
@@ -355,8 +392,9 @@ class SNSServiceImpl final : public SNSService::Service
                     std::getline(ifs, p);
                     if (p == "") continue;
                     p_time = p.substr(0, 20);
+                    bool b;
 
-                    Message msg_l = parseMessage(p);
+                    Message msg_l = parseMessage(p, 0, b);
 
                     msg_stack.push(msg_l);
                 }
@@ -368,16 +406,17 @@ class SNSServiceImpl final : public SNSService::Service
                     msg_stack.pop();
                 }
                 first_time = false;
-                std::thread t(catchTimlineUpdates, username, stream, ifs.tellg());
+                std::thread t(catchTimlineUpdates, username, stream);
+                ifs.close();
                 t.detach();
             }
 
             // Write the current message to "usernametimeline.txt"
             std::string filename = std::to_string(username) + "timeline.txt";
             std::ofstream user_file(filename, std::ios::app | std::ios::out | std::ios::in);
-            google::protobuf::Timestamp temptime = message.timestamp();
-            std::string time = google::protobuf::util::TimeUtil::ToString(temptime);
-            std::string fileinput = time + " :: " + std::to_string(message.username()) + ":" + message.msg() + "\n";
+            time_t temptime = message.timestamp();
+            std::string ttime = getTimeStamp(temptime);
+            std::string fileinput = ttime + " :: " + std::to_string(message.username()) + ":" + message.msg() + "\n";
             //"Set Stream" is the default message from the client to initialize the stream
             if (message.msg() != "Set Stream")
                 user_file << fileinput;
@@ -387,34 +426,29 @@ class SNSServiceImpl final : public SNSService::Service
             std::vector<int>::const_iterator it;
             for (it = c->client_followers.begin(); it != c->client_followers.end(); it++)
             {
-                Client *temp_client = &client_db[find_user(*it)];
+                int u_index = find_user(*it);
+                if (u_index < 0 || u_index > client_db.size()){
+                    std::cerr << "User " << *it << " not in client_db";
+                    continue;
+                }
+                Client *temp_client = &client_db[u_index];
                 if (temp_client->stream != 0 && temp_client->connected)
                     temp_client->stream->Write(message);
-                // For each of the current user's followers, put the message in their following.txt file
-                // std::string temp_username = std::to_string(temp_client->username);
-                // std::string temp_file = temp_username + "fTimelines.txt";
-                // std::ofstream following_file(temp_file, std::ios::app | std::ios::out | std::ios::in);
-                // following_file << fileinput;
-                // temp_client->following_file_size++;
-                // std::ofstream user_file(temp_username + ".txt", std::ios::app | std::ios::out | std::ios::in);
-                // user_file << fileinput;
+                
             }
         }
         // If the client disconnected from Chat Mode, set connected to false
         c->connected = false;
         return Status::OK;
     }
-};
 
-class SNSSandMInformImpl final : public SNSSandMInform::Service
-{
-    
+    //Master Slave Interaction
     Status PokeMaster(ServerContext *context, const ServerIdent *request, ServerIdent *response) override
     {
         slave_port = request->port();
         slave_addr = request->addr();
         std::string s_login_info = slave_addr + ":" + slave_port;
-        s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
+        s_stub = std::unique_ptr<SNSService::Stub>(SNSService::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
 
         std::cout << "Sibling process has made contact" << std::endl;
 
@@ -430,8 +464,14 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
         std::vector<int> following;
         auto fllig = request->following();
 
-        std::copy(fllrs.begin(), fllrs.end(), followers.begin());
-        std::copy(fllig.begin(), fllig.end(), following.begin());
+        //std::copy(fllrs.begin(), fllrs.end(), followers.begin());
+        for (int i : fllrs) {
+            followers.push_back(i);
+        }
+        //std::copy(fllig.begin(), fllig.end(), following.begin());
+        for (int i : fllig) {
+            followers.push_back(i);
+        }
 
         client_db[u_index].client_followers.clear();
         client_db[u_index].client_following.clear();
@@ -465,7 +505,7 @@ class SNSSandMInformImpl final : public SNSSandMInform::Service
     {
         login_help(request, reply);
         return Status::OK;
-    };
+    }
 };
 
 void RunServer(std::string port_no)
@@ -495,10 +535,11 @@ void RunServer(std::string port_no)
     std::cout << "Beginning heartbeat" << std::endl;
     std::thread t(heartbeat);
     t.detach();
+
     if (si.addr() != ""){
-        //SandMInform stub
+        //SNSService stub
         std::string s_login_info = si.addr() + ":" + si.port();
-        s_stub = std::unique_ptr<SNSSandMInform::Stub>(SNSSandMInform::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
+        s_stub = std::unique_ptr<SNSService::Stub>(SNSService::NewStub(grpc::CreateChannel(s_login_info, grpc::InsecureChannelCredentials())));
 
         ClientContext context1;
         ServerIdent sib_id;

@@ -162,6 +162,7 @@ class SNSCoordImpl final : public SNSCoord::Service
             {
                 response->set_addr(cif->slave_addr);
                 response->set_port(cif->slave_port);
+                std::cout << "NOTICE: Client " << cid << " is now running off of the slave" << std::endl;
             }
             if (reg_c.count(cid)){
                 cif->mtx.unlock();
@@ -310,7 +311,7 @@ void checkCluster(struct clustinfo *cif)
             cif->master_live = true; // ressurection
             std::cout << "The master for cluster " << cif->print() << " is now alive" << std::endl;
         }
-        if (mbeats > cif->mbeats + 1)
+        if (mbeats > cif->mbeats)
         { // if we miss 2 there's a failure
             // He's dead Jim...
             mbeats = 0;
@@ -327,7 +328,7 @@ void checkCluster(struct clustinfo *cif)
         //SLAVE CHECK
         if (!cif->slave_live && cif->sbeats > 0)
             cif->slave_live = true;
-        if (sbeats > cif->sbeats + 1)
+        if (sbeats > cif->sbeats)
         {
             // He's dead Jim...
             sbeats = 0;
