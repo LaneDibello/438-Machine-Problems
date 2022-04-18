@@ -428,7 +428,7 @@ class SNSServiceImpl final : public SNSService::Service
             {
                 int u_index = find_user(*it);
                 if (u_index < 0 || u_index > client_db.size()){
-                    std::cerr << "User " << *it << " not in client_db";
+                    std::cerr << "User " << *it << " not in client_db" << std::endl;
                     continue;
                 }
                 Client *temp_client = &client_db[u_index];

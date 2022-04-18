@@ -8,8 +8,6 @@ TODO:
 Put some mutexes in place for thread safety
 client_db should really be map
     would affect find_user, populate following, others...
-Timeline update function should ping the followers streams
-Test Slave Update FUnctionality
 
 
 Usages:

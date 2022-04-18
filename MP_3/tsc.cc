@@ -155,9 +155,9 @@ int main(int argc, char **argv)
 }
 
 void Client::renew_connection(){
-    //Every 10 seconsd check with the corrdinator to make sure master didn't die
+    //Every 5 seconsd check with the corrdinator to make sure master didn't die
     for(;;){
-        sleep(10);
+        sleep(5);
         ClientContext context;
         JoinReq jr;
         jr.set_id(c_id);
