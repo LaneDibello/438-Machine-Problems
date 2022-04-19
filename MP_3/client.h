@@ -136,7 +136,7 @@ void IClient::displayCommandReply(const std::string& comm, const IReply& reply) 
 				if (comm == "LIST") {
 					std::cout << "All users: ";
                     for (std::string room : reply.all_users) {
-                        std::cout << room << ", ";
+                        std::cout << "u" << room << ", ";
                     }
 					std::cout << "\nFollowers: ";
                     for (std::string room : reply.followers) {
@@ -195,7 +195,7 @@ void displayPostMessage(const std::string& sender, const std::string& message, s
 {
     std::string t_str(std::ctime(&time));
     t_str[t_str.size()-1] = '\0';
-    std::cout << sender << "(" << t_str << ") >> " << message << std::endl;
+    std::cout << "u" << sender << "(" << t_str << ") >> " << message << std::endl;
 }
 
 void displayReConnectionMessage(const std::string& host, const std::string & port) {

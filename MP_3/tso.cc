@@ -251,7 +251,7 @@ class SNSCoordImpl final : public SNSCoord::Service
         }
         catch (const std::out_of_range& oor){
             std::cerr << "GetFollowing:\n";
-            std::cerr << "Bad client id '" << cid << std::endl;
+            std::cerr << "Bad client id '" << cid << "'"<< std::endl;
             return Status::CANCELLED;
         }
         return Status::OK;

@@ -281,6 +281,9 @@ class SNSServiceImpl final : public SNSService::Service
         int toFollow = request->arguments(0);
         std::cout << username1 << " is attempting to follow " << toFollow << std::endl;
         int join_index = find_user(toFollow);
+        if (toFollow < 1) {
+            std::cerr << "Bad Client id toFollow: " << toFollow << std::endl;
+        }
         if (join_index < 0 && username1 != toFollow){
             Client *user1 = &client_db[find_user(username1)];
             if (std::find(user1->client_following.begin(), user1->client_following.end(), toFollow) != user1->client_following.end())

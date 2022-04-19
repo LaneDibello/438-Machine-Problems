@@ -227,8 +227,8 @@ IReply Client::processCommand(std::string &input)
             std::cout << "Invalid Input -- No Arguments Given\n";
         }
         */
-
-        int argument = atoi(input.substr(index + 1, (input.length() - index)).c_str());
+        if (input[index + 1] == 'u') index++;
+        int argument = atoi(input.substr(index + 1/*, (input.length() - index)*/).c_str());
 
         if (cmd == "FOLLOW")
         {
