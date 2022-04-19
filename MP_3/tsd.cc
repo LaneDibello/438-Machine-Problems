@@ -638,11 +638,32 @@ int main(int argc, char **argv)
         }
     }
     
-    char hostbuff[32];
-    int host = gethostname(hostbuff, 32);
-    struct hostent *host_entry = gethostbyname(hostbuff);
-    char* IP = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
-    my_hostname = IP;
+    char hostbuffer[256];
+    char *IPbuffer;
+    struct hostent *host_entry;
+    int hostname;
+  
+    hostname = gethostname(hostbuffer, sizeof(hostbuffer));
+    host_entry = gethostbyname(hostbuffer);
+    IPbuffer = inet_ntoa(*((struct in_addr*)
+                           host_entry->h_addr_list[0]));
+  
+    //DEBUG
+    // printf("Hostname: %s\n", hostbuffer);
+    // printf("Host IP: %s", IPbuffer);
+
+    my_hostname = IPbuffer;
+
+
+    // char hostbuff[32];
+    // int host = gethostname(hostbuff, 32);
+    // struct hostent *host_entry = gethostbyname(hostbuff);
+    // char* IP = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
+    // my_hostname = IP;
+
+    std::cout << "------------------------------" << std::endl;
+    std::cout << "My hostname is " << my_hostname << std::endl;
+    std::cout << "------------------------------" << std::endl;
 
     RunServer(my_port);
 

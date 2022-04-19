@@ -113,6 +113,10 @@ class SNSCoordImpl final : public SNSCoord::Service
             cif->master_port = request->port();
             cif->master_live = true;
 
+            if (cif->master_addr.substr(0, 3) == "127") {
+                std::cerr << "Warning: Master " << id << "'s address is local" << std::endl;
+            }
+
             std::cout << "Master has arrived for " << id << std::endl;
 
             std::thread t(checkCluster, cif); // start waiting for heartbeat if it's the master
