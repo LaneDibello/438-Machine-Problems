@@ -16,9 +16,9 @@ service SNSService{
   rpc TimelineUpdate (MsgChunk) returns (Blep) {} //Master tells slaves about messages
 }
 
-// Master/Slave Interaction
-service SNSSandMInform{
-  }
+// Master/Slave Interaction DEPRECATED
+//service SNSSandMInform{
+//  }
 
 //The Coordination Service definition
 service SNSCoord{
